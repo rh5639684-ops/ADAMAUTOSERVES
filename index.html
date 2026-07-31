@@ -53,7 +53,7 @@
 
         .logo {
             color: var(--text-light);
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 700;
             letter-spacing: 1.5px;
             cursor: pointer;
@@ -63,15 +63,15 @@
         nav {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
         }
 
-        nav ul { display: flex; list-style: none; gap: 20px; align-items: center; }
+        nav ul { display: flex; list-style: none; gap: 15px; align-items: center; }
 
         nav ul li a {
             color: var(--text-light);
             text-decoration: none;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 500;
             transition: 0.3s;
             cursor: pointer;
@@ -79,7 +79,30 @@
 
         nav ul li a:hover, nav ul li a.active { color: var(--porsche-orange); }
 
-        /* ملف معلومات الحساب */
+        /* Toast Notification System */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            background: var(--porsche-black);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 4px;
+            border-right: 4px solid var(--porsche-orange);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            font-size: 14px;
+            animation: slideInLeft 0.3s ease, fadeOut 0.3s ease 3.7s forwards;
+        }
+        @keyframes slideInLeft { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; transform: translateY(10px); } }
+
+        /* User Profile */
         .user-profile-container {
             position: relative;
             display: none;
@@ -88,19 +111,19 @@
         .user-badge {
             background-color: #222;
             color: white;
-            padding: 8px 15px;
+            padding: 6px 12px;
             border-radius: 4px;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
             border: 1px solid #444;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             transition: 0.3s;
         }
 
         .user-badge:hover { border-color: var(--porsche-orange); }
-        .user-badge::before { content: '👤'; font-size: 16px; }
+        .user-badge::before { content: '👤'; font-size: 15px; }
 
         .profile-dropdown {
             display: none;
@@ -119,11 +142,10 @@
         }
 
         .profile-dropdown.show { display: block; }
-        .profile-dropdown h5 { font-size: 16px; border-bottom: 1px solid #444; padding-bottom: 8px; margin-bottom: 10px; color: var(--porsche-orange); }
+        .profile-dropdown h5 { font-size: 15px; border-bottom: 1px solid #444; padding-bottom: 8px; margin-bottom: 10px; color: var(--porsche-orange); }
         .profile-dropdown p { font-size: 13px; color: #ccc; margin-bottom: 8px; direction: ltr; text-align: right; }
         .profile-dropdown p strong { color: white; direction: rtl; display: inline-block; }
 
-        /* سجل الفواتير */
         .history-section {
             margin-top: 15px;
             border-top: 1px dashed #444;
@@ -131,7 +153,7 @@
             max-height: 180px;
             overflow-y: auto;
         }
-        .history-section h6 { font-size: 13px; color: #aaa; margin-bottom: 8px; }
+        .history-section h6 { font-size: 12px; color: #aaa; margin-bottom: 8px; }
         .invoice-item {
             background: #111;
             padding: 8px;
@@ -153,7 +175,7 @@
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* 1. الصفحة الرئيسية */
+        /* Hero & Stats Counter */
         .hero {
             position: relative;
             height: 75vh;
@@ -164,39 +186,56 @@
             text-align: center;
             color: white;
             padding: 20px;
-            background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55));
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6));
             background-size: cover;
             background-position: center;
-            background-repeat: no-repeat;
             transition: background-image 1s ease-in-out; 
         }
 
-        .hero h1 { font-size: 45px; margin-bottom: 15px; font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.7); z-index: 2; }
-        .hero p { font-size: 18px; max-width: 600px; line-height: 1.6; text-shadow: 0 2px 8px rgba(0,0,0,0.7); z-index: 2; }
-        
-        /* 2. عن الورشة */
+        .hero h1 { font-size: 42px; margin-bottom: 15px; font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.7); }
+        .hero p { font-size: 17px; max-width: 600px; line-height: 1.6; text-shadow: 0 2px 8px rgba(0,0,0,0.7); }
+
+        /* Stats Bar */
+        .stats-bar {
+            background-color: var(--porsche-black);
+            color: white;
+            padding: 30px 20px;
+            border-bottom: 3px solid var(--porsche-orange);
+        }
+        .stats-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            text-align: center;
+        }
+        .stat-box h3 { font-size: 32px; color: var(--porsche-orange); margin-bottom: 5px; font-weight: 700; }
+        .stat-box p { font-size: 14px; color: #bbb; }
+
+        /* About Section */
         #page-about { background-color: var(--porsche-light-gray); padding-bottom: 60px; }
-        .about-header { text-align: center; padding: 50px 20px; background-color: var(--porsche-black); margin-bottom: 40px; border-bottom: 3px solid var(--porsche-orange); }
-        .about-header h2 { font-size: 36px; color: #ffffff; margin-bottom: 15px; font-weight: 700; }
-        .about-header p { color: #ccc; font-size: 18px; }
+        .about-header { text-align: center; padding: 40px 20px; background-color: var(--porsche-black); margin-bottom: 40px; border-bottom: 3px solid var(--porsche-orange); }
+        .about-header h2 { font-size: 32px; color: #ffffff; margin-bottom: 10px; }
+        .about-header p { color: #ccc; font-size: 16px; }
         .about-section { max-width: 1000px; margin: 0 auto; }
         .about-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; padding: 0 20px; }
         .about-box { background: white; border: 1px solid #e1e1e5; padding: 30px; border-radius: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.03); }
-        .about-box h3 { color: var(--porsche-black); font-size: 22px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; border-right: 3px solid var(--porsche-orange); padding-right: 10px; }
+        .about-box h3 { color: var(--porsche-black); font-size: 20px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; border-right: 3px solid var(--porsche-orange); padding-right: 10px; }
         .about-box ul { list-style: none; }
-        .about-box ul li { margin-bottom: 12px; font-size: 16px; color: #444; line-height: 1.6; position: relative; padding-right: 20px; }
+        .about-box ul li { margin-bottom: 12px; font-size: 15px; color: #444; line-height: 1.6; position: relative; padding-right: 20px; }
         .about-box ul li::before { content: '✔'; position: absolute; right: 0; color: var(--porsche-orange); font-weight: bold; }
 
-        /* 3. الخدمات */
+        /* Services */
         #page-services { background-color: var(--porsche-silver); padding-bottom: 60px; }
         .services-container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
-        .section-title { text-align: center; font-size: 32px; margin-bottom: 40px; color: var(--porsche-black); }
+        .section-title { text-align: center; font-size: 30px; margin-bottom: 40px; color: var(--porsche-black); }
         .section-title::after { content: ''; display: block; width: 50px; height: 3px; background: var(--porsche-orange); margin: 10px auto; }
         .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 25px; }
         
         .service-card { 
             background: white; 
-            padding: 30px 20px; 
+            padding: 25px 20px; 
             border-radius: 6px; 
             text-align: center; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
@@ -205,121 +244,148 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 320px;
+            min-height: 300px;
         }
         .service-card:hover { transform: translateY(-8px); border-bottom-color: var(--porsche-orange); }
-        .service-icon { font-size: 45px; margin-bottom: 12px; color: var(--porsche-orange); }
-        .service-card h3 { font-size: 20px; color: var(--porsche-black); margin-bottom: 10px; }
-        .service-card p { font-size: 14px; color: #555; line-height: 1.5; margin-bottom: 20px; flex-grow: 1; }
+        .service-icon { font-size: 40px; margin-bottom: 10px; color: var(--porsche-orange); }
+        .service-card h3 { font-size: 19px; color: var(--porsche-black); margin-bottom: 10px; }
+        .service-card p { font-size: 13px; color: #555; line-height: 1.5; margin-bottom: 20px; flex-grow: 1; }
         
         .service-book-btn {
-            background-color: var(--porsche-black); color: #fff; border: none; padding: 10px 15px; font-size: 14px;
+            background-color: var(--porsche-black); color: #fff; border: none; padding: 10px 15px; font-size: 13px;
             font-weight: bold; border-radius: 4px; cursor: pointer; transition: 0.3s; width: 100%;
         }
         .service-book-btn:hover { background-color: var(--porsche-orange); }
 
-        /* النماذج الحركية */
+        /* FAQ Section */
+        .faq-container { max-width: 800px; margin: 50px auto; padding: 0 20px; }
+        .faq-item { background: white; margin-bottom: 15px; border-radius: 4px; overflow: hidden; border: 1px solid #ddd; }
+        .faq-question { background: var(--porsche-black); color: white; padding: 15px 20px; cursor: pointer; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        .faq-answer { padding: 15px 20px; background: #fff; color: #444; font-size: 14px; line-height: 1.6; display: none; border-top: 1px solid #eee; }
+        .faq-item.active .faq-answer { display: block; }
+
+        /* Forms & Booking */
         #page-login, #page-register, #page-booking, #page-admin { background-color: var(--porsche-dark-gray); color: white; }
         .form-section { display: flex; justify-content: center; align-items: center; padding: 60px 20px; }
-        .form-container { background: #252525; padding: 40px; border-radius: 4px; width: 100%; max-width: 480px; border-top: 4px solid var(--porsche-orange); }
+        .form-container { background: #252525; padding: 35px; border-radius: 4px; width: 100%; max-width: 480px; border-top: 4px solid var(--porsche-orange); }
         .form-container h3 { margin-bottom: 10px; text-align: center; color: white; }
-        .work-hours-note { text-align: center; color: #aaa; font-size: 12px; margin-bottom: 25px; }
+        .work-hours-note { text-align: center; color: #aaa; font-size: 12px; margin-bottom: 20px; }
         .form-group { margin-bottom: 15px; text-align: right; }
-        .form-group label { display: block; margin-bottom: 8px; font-size: 14px; color: #bbb; }
+        .form-group label { display: block; margin-bottom: 6px; font-size: 13px; color: #bbb; }
         
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; background: #111; border: 1px solid #444; color: white; border-radius: 3px; }
-        .form-group textarea { resize: vertical; min-height: 80px; font-family: inherit; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 11px; background: #111; border: 1px solid #444; color: white; border-radius: 3px; font-size: 14px; }
+        .form-group textarea { resize: vertical; min-height: 70px; font-family: inherit; }
         .form-group input[type="date"] { direction: ltr; text-align: left; }
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--porsche-orange); outline: none; }
 
-        /* الحقول الديناميكية الفنية */
         .dynamic-field { display: none; animation: fadeInField 0.4s ease forwards; }
         @keyframes fadeInField { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* تذكرة الموعد الذكية التفاعلية المحدثة بالألوان الجديدة */
+        /* Ticket Box */
         .ticket-box {
             background: #ffffff;
             color: #000;
             border-radius: 8px;
-            padding: 25px;
-            margin-top: 25px;
+            padding: 20px;
+            margin-top: 20px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             display: none;
             transition: all 0.4s ease;
         }
 
-        /* حالة قيد الانتظار */
         .status-pending { border-right: 6px solid #ff5500; background: #ffffff; }
-        /* حالة القبول: تتحول الخلفية إلى اللون الأخضر المريح بالكامل */
         .status-accepted { border-right: 6px solid #2e7d32; background: #e8f5e9 !important; }
-        /* حالة الرفض: تتحول الخلفية إلى اللون الأحمر الصريح بالكامل */
         .status-rejected { border-right: 6px solid #c62828; background: #ffebee !important; }
 
-        .ticket-box h4 { margin-bottom: 15px; font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 8px; transition: color 0.3s ease; color: #333; }
-        .ticket-item { margin-bottom: 10px; font-size: 15px; }
+        .ticket-box h4 { margin-bottom: 12px; font-size: 17px; border-bottom: 1px solid #ddd; padding-bottom: 6px; color: #333; }
+        .ticket-item { margin-bottom: 8px; font-size: 14px; }
         .ticket-item strong { color: #333; }
         .ticket-datetime-output { direction: ltr; display: inline-block; font-weight: bold; }
 
-        .badge-status { padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 13px; display: inline-block; }
+        .badge-status { padding: 3px 8px; border-radius: 20px; font-weight: bold; font-size: 12px; display: inline-block; }
         .badge-pending { background: #ffe0b2; color: #e65100; }
         .badge-accepted { background: #c8e6c9; color: #1b5e20; }
         .badge-rejected { background: #ffcdd2; color: #b71c1c; }
 
         .invoice-block {
-            margin-top: 15px;
+            margin-top: 12px;
             background: rgba(0,0,0,0.03);
-            padding: 12px;
+            padding: 10px;
             border-radius: 4px;
             border: 1px dashed #ccc;
-            font-size: 13px;
+            font-size: 12px;
         }
-        .invoice-title { font-weight: bold; color: #0d0d0d; border-bottom: 1px dashed #aaa; padding-bottom: 5px; margin-bottom: 8px; display: flex; justify-content: space-between; }
+        .invoice-title { font-weight: bold; color: #0d0d0d; border-bottom: 1px dashed #aaa; padding-bottom: 4px; margin-bottom: 6px; display: flex; justify-content: space-between; }
 
         .btn {
-            background-color: var(--porsche-orange); color: white; padding: 12px 25px; border: none; cursor: pointer;
-            width: 100%; font-size: 16px; font-weight: bold; transition: 0.3s; text-decoration: none; display: inline-block; text-align: center;
+            background-color: var(--porsche-orange); color: white; padding: 11px 20px; border: none; cursor: pointer;
+            width: 100%; font-size: 15px; font-weight: bold; transition: 0.3s; text-decoration: none; display: inline-block; text-align: center;
         }
         .btn:hover { background-color: #cc4400; }
         
-        /* أزرار الإدارة المخصصة للقبول والرفض */
         .admin-actions { display: flex; gap: 10px; margin-top: 15px; }
         .btn-approve { background-color: #2e7d32; color: white; }
-        .btn-approve:hover { background-color: #1b5e20; }
         .btn-reject { background-color: #c62828; color: white; }
-        .btn-reject:hover { background-color: #b71c1c; }
 
-        .form-redirect { text-align: center; margin-top: 20px; color: #888; font-size: 13px; }
+        .form-redirect { text-align: center; margin-top: 15px; color: #888; font-size: 12px; }
         .form-redirect a { color: var(--porsche-orange); cursor: pointer; text-decoration: none; font-weight: bold; }
 
-        /* الفوتر */
+        /* Floating Emergency Towing Button */
+        .emergency-float {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background-color: #c62828;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(198,40,40,0.4);
+            z-index: 998;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 13px;
+            transition: 0.3s;
+        }
+        .emergency-float:hover { background-color: #b71c1c; transform: scale(1.05); }
+
+        /* Footer */
         footer { background: var(--porsche-black); color: var(--text-light); padding: 40px 20px 20px; border-top: 3px solid var(--porsche-orange); }
         .footer-content { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px; }
-        .footer-info h4 { font-size: 22px; color: white; margin-bottom: 10px; }
-        .footer-info p { color: #ccc; font-size: 16px; max-width: 600px; line-height: 1.6; }
-        .footer-location { color: var(--porsche-orange) !important; font-weight: bold; font-size: 18px !important; margin-top: 5px; }
+        .footer-info h4 { font-size: 20px; color: white; margin-bottom: 8px; }
+        .footer-info p { color: #ccc; font-size: 15px; max-width: 600px; line-height: 1.6; }
+        .footer-location { color: var(--porsche-orange) !important; font-weight: bold; font-size: 17px !important; margin-top: 5px; }
 
-        .footer-social { display: flex; gap: 15px; margin-top: 10px; flex-wrap: wrap; justify-content: center; }
-        .social-btn { padding: 10px 20px; border-radius: 4px; text-decoration: none; color: white; font-weight: bold; font-size: 14px; transition: transform 0.2s; }
+        .footer-social { display: flex; gap: 12px; margin-top: 10px; flex-wrap: wrap; justify-content: center; }
+        .social-btn { padding: 9px 18px; border-radius: 4px; text-decoration: none; color: white; font-weight: bold; font-size: 13px; transition: transform 0.2s; }
         .social-btn:hover { transform: scale(1.05); }
         
         .tiktok-btn { background: linear-gradient(45deg, #010101, #ee1d52, #69c9d0); }
         .instagram-btn { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
         .phone-btn { background-color: #25D366; }
         
-        .copyright { margin-top: 30px; font-size: 13px; color: #666; border-top: 1px solid #222; padding-top: 15px; width: 100%; }
+        .copyright { margin-top: 25px; font-size: 12px; color: #666; border-top: 1px solid #222; padding-top: 15px; width: 100%; }
 
         @media (max-width: 992px) {
-            .nav-container { flex-direction: column; gap: 15px; }
-            nav ul { flex-wrap: wrap; justify-content: center; gap: 12px; }
-            .hero h1 { font-size: 30px; }
-            .hero p { font-size: 15px; }
-            footer { padding: 30px 15px 15px; }
-            .profile-dropdown { left: auto; right: 0; width: 100%; min-width: 290px; }
-            .logo { font-size: 24px; }
+            .nav-container { flex-direction: column; gap: 12px; }
+            nav ul { flex-wrap: wrap; justify-content: center; gap: 10px; }
+            .hero h1 { font-size: 28px; }
+            .hero p { font-size: 14px; }
+            .logo { font-size: 22px; }
         }
     </style>
 </head>
 <body>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <!-- Floating Emergency Towing Button -->
+    <a href="https://wa.me/966547070334?text=السلام عليكم، أحتاج مساعدة طارئة أو سحب سيارة (سطحة) لسيارة بورش متعطلة بالخبر." target="_blank" class="emergency-float">
+        🚨 طلب سحب طارئ (سطحة)
+    </a>
 
     <header>
         <div class="nav-container">
@@ -329,6 +395,7 @@
                     <li><a id="nav-home" class="active" onclick="navigateTo('home')">الرئيسية</a></li>
                     <li><a id="nav-about" onclick="navigateTo('about')">عن الورشة</a></li>
                     <li><a id="nav-services" onclick="navigateTo('services')">الخدمات</a></li>
+                    <li><a id="nav-faq" onclick="navigateTo('faq')">الأسئلة الشائعة</a></li>
                     <li><a id="nav-booking" onclick="navigateTo('booking')">حجز موعد</a></li>
                     <li id="menu-login"><a id="nav-login" onclick="navigateTo('login')">تسجيل الدخول</a></li>
                     <li id="menu-register"><a id="nav-register" onclick="navigateTo('register')">حساب جديد</a></li>
@@ -357,14 +424,38 @@
         </div>
     </header>
 
+    <!-- 1. الرئيسية مع عداد الإنجازات -->
     <div id="page-home" class="page active-page">
         <section class="hero" id="hero-slider">
-            <h1> آدم أوتو سيرفس</h1>
-            <p>الهندسة الدقيقة تستحق رعاية فائقة. نحن هنا لنضمن بقاء سيارتك الـ بورش بأعلى كفاءة وأقوى أداء على الطريق.</p><br>
-            <button class="btn" style="width: auto;" onclick="navigateTo('about')">اكتشف آدم أوتو سيرفس الآن</button>
+            <h1>آدم أوتو سيرفس</h1>
+            <p>الهندسة الدقيقة تستحق رعاية فائقة. نحن هنا لنضمن بقاء سيارتك الـ بورش بأعلى كفاءة وأقوى أداء على الطريق في الخبر.</p><br>
+            <button class="btn" style="width: auto;" onclick="navigateTo('booking')">احجز موعد صيانة الآن</button>
         </section>
+
+        <!-- عداد الإنجازات -->
+        <div class="stats-bar">
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <h3>+850</h3>
+                    <p>سيارة بورش تم صيانتها وبرمجتها</p>
+                </div>
+                <div class="stat-box">
+                    <h3>100%</h3>
+                    <p>قطع أصلية ومعايير مصنعية</p>
+                </div>
+                <div class="stat-box">
+                    <h3>+12</h3>
+                    <p>عاماً من الخبرة التخصصية الفائقة</p>
+                </div>
+                <div class="stat-box">
+                    <h3>24/7</h3>
+                    <p>دعم طوارئ وسحب سريع بالخبر</p>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <!-- 2. عن الورشة -->
     <div id="page-about" class="page">
         <div class="about-header">
             <h2>مركز آدم أوتو سيرفس لسيارات بورش</h2>
@@ -375,7 +466,7 @@
                 <div class="about-box">
                     <h3>⚙️ معلومات عن الورشة</h3>
                     <p style="color: #444; line-height: 1.8; font-size: 15px;">
-                        يعتبر مركز <strong>آدم أوتو سيرفس</strong> صرحاً متكاملاً مخصصاً صيانة وبرمجة وفحص سيارات بورش بكافة طرازاتها وفئاتها بالخبر. نوفر لعملائنا رعاية فائقة تتوافق مع المعايير والمواصفات القياسية المصنعية للسيارات الرياضية الفاخرة.
+                        يعتبر مركز <strong>آدم أوتو سيرفس</strong> صرحاً متكاملاً مخصصاً لصيانة وبرمجة وفحص سيارات بورش بكافة طرازاتها وفئاتها بالخبر. نوفر لعملائنا رعاية فائقة تتوافق مع المعايير والمواصفات القياسية المصنعية للسيارات الرياضية الفاخرة.
                     </p>
                 </div>
                 <div class="about-box">
@@ -393,6 +484,7 @@
         </section>
     </div>
 
+    <!-- 3. الخدمات -->
     <div id="page-services" class="page">
         <div class="services-container">
             <h2 class="section-title">خدماتنا المتميزة لسيارات بورش</h2>
@@ -403,23 +495,23 @@
                         <h3>تغيير الزيت</h3>
                         <p>نستخدم أفضل الزيوت المعتمدة والموصى بها من المصنع لضمان سلاسة وحماية المحرك.</p>
                     </div>
-                    <button class="service-book-btn" onclick="quickBook('تغيير زيت وفلاتر بورش')">حجز موعد</button>
+                    <button class="service-book-btn" onclick="quickBook('تغيير زيت وفلاتر بورش')">حجز موعد (450 ر.س)</button>
                 </div>
                 <div class="service-card">
                     <div>
                         <div class="service-icon">🔍</div>
                         <h3>فحص ما قبل الشراء</h3>
-                        <p>فحص شامل دقيق ومفصل لمحرك وبدي وأنظمة سيارة بورش قبل إتمام عملية شرائها لتكون في اطمئنان تام.</p>
+                        <p>فحص شامل دقيق ومفصل لمحرك وبدي وأنظمة سيارة بورش قبل إتمام شرائها لتكون في اطمئنان تام.</p>
                     </div>
-                    <button class="service-book-btn" onclick="quickBook('فحص ما قبل الشراء')">حجز موعد</button>
+                    <button class="service-book-btn" onclick="quickBook('فحص ما قبل الشراء')">حجز موعد (500 ر.س)</button>
                 </div>
                 <div class="service-card">
                     <div>
                         <div class="service-icon">🔧</div>
                         <h3>الصيانة الدورية</h3>
-                        <p>فحص ميكانيكي الكهربائي دقيق وشامل لجميع أجزاء السيارة بأحدث الأجهزة المخصصة.</p>
+                        <p>فحص ميكانيكي وكهربائي دقيق وشامل لجميع أجزاء السيارة بأحدث الأجهزة المخصصة.</p>
                     </div>
-                    <button class="service-book-btn" onclick="quickBook('فحص وصيانة ميكانيكية شاملة')">حجز موعد</button>
+                    <button class="service-book-btn" onclick="quickBook('فحص وصيانة ميكانيكية شاملة')">حجز موعد (350 ر.س)</button>
                 </div>
                 <div class="service-card">
                     <div>
@@ -427,7 +519,7 @@
                         <h3>صيانة عامة</h3>
                         <p>إصلاح الأنظمة الميكانيكية والمعقدة، والتربيط، ومعالجة كافة المشاكل والعيوب المصنعية باحترافية.</p>
                     </div>
-                    <button class="service-book-btn" onclick="quickBook('صيانة عامة وإصلاح ميكانيكي')">حجز موعد</button>
+                    <button class="service-book-btn" onclick="quickBook('صيانة عامة وإصلاح ميكانيكي')">حجز موعد (600 ر.س)</button>
                 </div>
                 <div class="service-card">
                     <div>
@@ -435,12 +527,38 @@
                         <h3>برمجة وفحص كمبيوتر</h3>
                         <p>تحديث الأنظمة، قراءة الأعطال بدقة، وبرمجة كاملة لجميع كمبيوترات سيارات بورش.</p>
                     </div>
-                    <button class="service-book-btn" onclick="quickBook('برمجة وفحص كمبيوتر متطور')">حجز موعد</button>
+                    <button class="service-book-btn" onclick="quickBook('برمجة وفحص كمبيوتر متطور')">حجز موعد (250 ر.س)</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- 4. الأسئلة الشائعة FAQ -->
+    <div id="page-faq" class="page">
+        <div class="services-container">
+            <h2 class="section-title">الأسئلة الشائعة</h2>
+            <div class="faq-container">
+                <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-question"><span>هل تستخدمون قطع غيار أصلية ومعتمدة لسيارات بورش؟</span> <span>▼</span></div>
+                    <div class="faq-answer">نعم، نعتمد على قطع الغيار الأصلية والمطابقة تماماً للمواصفات المصنعية لضمان أداء رياضي آمن ومستدام لسيارتك.</div>
+                </div>
+                <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-question"><span>كم تستغرق عملية فحص الكمبيوتر وبرمجة السيارة؟</span> <span>▼</span></div>
+                    <div class="faq-answer">تستغرق عملية الفحص الشامل وبرمجة الأنظمة عادة ما بين 45 دقيقة إلى ساعتين كحد أقصى بحسب موديل السيارة ونوع الخدمة المطلوبة.</div>
+                </div>
+                <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-question"><span>هل توفرون ضماناً على أعمال الصيانة والإصلاح؟</span> <span>▼</span></div>
+                    <div class="faq-answer">نعم، نقدم ضماناً معتمداً على كافة أعمال الإصلاح الميكانيكي وقطع الغيار والبرمجة المقدمة في مركز آدم أوتو سيرفس.</div>
+                </div>
+                <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-question"><span>كيف يمكنني طلب خدمة السطحة الطارئة؟</span> <span>▼</span></div>
+                    <div class="faq-answer">يمكنك الضغط على زر "طلب سحب طارئ (سطحة)" العائم أسفل الشاشة، وسيتواصل معك فريق الطوارئ فوراً لتوجيه السطحة لموقعك بالخبر.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. حجز الموعد مع اختيار طراز بورش والحاسبة -->
     <div id="page-booking" class="page">
         <section class="form-section">
             <div class="form-container">
@@ -456,14 +574,30 @@
                         <label>رقم هاتف العميل</label>
                         <input type="tel" id="bookGuestPhone" placeholder="05xxxxxxxx">
                     </div>
+
+                    <!-- اختيار طراز بورش بدقة -->
+                    <div class="form-group">
+                        <label>طراز سيارة بورش</label>
+                        <select id="porscheModel" required>
+                            <option value="" disabled selected>-- اختر طراز سيارتك --</option>
+                            <option value="Porsche 911">Porsche 911</option>
+                            <option value="Porsche Cayenne">Porsche Cayenne</option>
+                            <option value="Porsche Macan">Porsche Macan</option>
+                            <option value="Porsche Panamera">Porsche Panamera</option>
+                            <option value="Porsche Taycan (Electric)">Porsche Taycan (كهربائية)</option>
+                            <option value="Porsche 718 Cayman / Boxster">Porsche 718 Cayman / Boxster</option>
+                            <option value="أخرى / موديل آخر">أخرى / موديل آخر</option>
+                        </select>
+                    </div>
+
                     <div class="form-group">
                         <label>نوع الخدمة المطلوبة</label>
                         <select id="bookService" onchange="handleServiceFieldsChange()" required>
-                            <option value="تغيير زيت وفلاتر بورش">تغيير زيت وفلاتر</option>
-                            <option value="فحص ما قبل الشراء">فحص ما قبل الشراء</option>
-                            <option value="فحص وصيانة ميكانيكية شاملة">فحص وصيانة شاملة (صيانة دورية)</option>
-                            <option value="صيانة عامة وإصلاح ميكانيكي">صيانة عامة وإصلاح ميكانيكي</option>
-                            <option value="برمجة وفحص كمبيوتر متطور">برمجة وفحص كمبيوتر</option>
+                            <option value="تغيير زيت وفلاتر بورش">تغيير زيت وفلاتر (450 ر.س)</option>
+                            <option value="فحص ما قبل الشراء">فحص ما قبل الشراء (500 ر.س)</option>
+                            <option value="فحص وصيانة ميكانيكية شاملة">فحص وصيانة شاملة (350 ر.س)</option>
+                            <option value="صيانة عامة وإصلاح ميكانيكي">صيانة عامة وإصلاح (600 ر.س)</option>
+                            <option value="برمجة وفحص كمبيوتر متطور">برمجة وفحص كمبيوتر (250 ر.س)</option>
                         </select>
                     </div>
 
@@ -521,17 +655,18 @@
                             <option value="8:00 مساءً">8:00 مساءً</option>
                         </select>
                     </div>
-                    <button type="submit" class="btn">تأكيد وإرسال تفاصيل الحجز الفورية عبر الواتساب</button>
+                    <button type="submit" class="btn">تأكيد الحساب وإرسال التفاصيل عبر الواتساب</button>
                 </form>
 
-                <!-- تذكرة الموعد التفاعلية الذكية المعدلة -->
+                <!-- تذكرة الموعد الذكية التفاعلية -->
                 <div class="ticket-box status-pending" id="appointmentTicket">
                     <h4 id="ticketHeaderTitle">⏳ حالة الطلب: قيد الانتظار والمراجعة</h4>
                     <div class="ticket-item"><strong>اسم العميل:</strong> <span id="tickName">---</span></div>
                     <div class="ticket-item"><strong>رقم هاتف العميل:</strong> <span id="tickPhone" style="direction: ltr; display: inline-block;">---</span></div>
+                    <div class="ticket-item"><strong>طراز السيارة:</strong> <span id="tickModel">---</span></div>
                     <div class="ticket-item"><strong>نوع الخدمة:</strong> <span id="tickService">---</span></div>
                     
-                    <div class="ticket-item" id="tickDynamicSpecs" style="background: #fdfdfd; padding: 6px; border-radius: 4px; display:none; font-size: 14px; border: 1px solid #eee;"></div>
+                    <div class="ticket-item" id="tickDynamicSpecs" style="background: #fdfdfd; padding: 6px; border-radius: 4px; display:none; font-size: 13px; border: 1px solid #eee;"></div>
                     
                     <div class="ticket-item"><strong>تاريخ ووقت الحجز:</strong> <span id="tickDateTime" class="ticket-datetime-output">---</span></div>
                     
@@ -540,11 +675,11 @@
                             <span>🧾 فاتورة مبدئية رقم: #<span id="invId">0000</span></span>
                             <span id="liveStatusBadge" class="badge-status badge-pending">في انتظار قرار الإدارة...</span>
                         </div>
-                        <div class="ticket-item" style="font-size:13px; margin-top:10px;"><strong>البيان:</strong> فحص وصيانة سيارات بورش</div>
-                        <div class="ticket-item" style="font-size:13px;"><strong>المبلغ التقريبي:</strong> <span id="invPrice" style="font-weight:bold; color:var(--porsche-orange);">0</span> ريال قطعي</div>
-                        <div class="ticket-item" id="tickRejectionReason" style="font-size:12px; color:#c62828; margin-top:8px; display:none; background:#ffcdd2; padding:5px; border-radius:3px;"></div>
-                        <div class="ticket-item" style="font-size:11px; color:#444; font-weight: bold; margin-top: 10px; text-align: center;" id="liveStatusNote">
-                            * يقوم المسؤول الفني بالمركز الآن بمراجعة طلب الحجز وتأكيده من خلال النظام الإداري المحمي.
+                        <div class="ticket-item" style="font-size:12px; margin-top:8px;"><strong>البيان:</strong> صيانة متخصصة لسيارات بورش</div>
+                        <div class="ticket-item" style="font-size:12px;"><strong>السعر النهائي المعتمد:</strong> <span id="invPrice" style="font-weight:bold; color:var(--porsche-orange);">0</span> ريال قطعي</div>
+                        <div class="ticket-item" id="tickRejectionReason" style="font-size:11px; color:#c62828; margin-top:6px; display:none; background:#ffcdd2; padding:5px; border-radius:3px;"></div>
+                        <div class="ticket-item" style="font-size:11px; color:#444; font-weight: bold; margin-top: 8px; text-align: center;" id="liveStatusNote">
+                            * يقوم المسؤول الفني بالمركز الآن بمراجعة طلب الحجز وتأكيده عبر النظام الإداري.
                         </div>
                     </div>
                 </div>
@@ -568,7 +703,7 @@
                     <button type="submit" class="btn">تسجيل الدخول</button>
                 </form>
                 <div class="form-redirect">
-                    ليس لديك حساب? <a onclick="navigateTo('register')">أنشئ حساباً جديداً</a>
+                    ليس لديك حساب؟ <a onclick="navigateTo('register')">أنشئ حساباً جديداً</a>
                 </div>
             </div>
         </section>
@@ -607,25 +742,29 @@
     <div id="page-admin" class="page">
         <section class="form-section">
             <div class="form-container" style="border-top-color: #2e7d32;">
-                <h3>🔐 لوحة التحكم الخاصة بالمسؤولين فقط</h3>
-                <p class="work-hours-note">إدارة واعتماد طلبات حجز صيانة ورشة آدم</p>
+                <h3>🔐 لوحة التحكم الخاصة بالمسؤولين</h3>
+                <p class="work-hours-note">إدارة واعتماد وتحديد أسعار طلبات صيانة ورشة آدم</p>
                 
                 <div class="form-group">
                     <label>كلمة مرور المسؤول الصارمة</label>
-                    <input type="password" id="adminSecretKey" placeholder="أدخل رمز مرور الإدارة التابع لآدم">
+                    <input type="password" id="adminSecretKey" placeholder="أدخل رمز مرور الإدارة">
                 </div>
                 <div class="form-group">
-                    <label>رقم الفاتورة المبدئية المراد معالجتها</label>
+                    <label>رقم الفاتورة المراد معالجتها</label>
                     <input type="number" id="adminInvoiceId" placeholder="مثال: 563214">
                 </div>
                 <div class="form-group">
-                    <label>سبب الرفض (مطلوب فقط في حالة الرفض)</label>
-                    <textarea id="adminRejectReason" placeholder="اكتب سبب رفض الحجز هنا ليوضحه النظام للعميل..."></textarea>
+                    <label>تحديد السعر النهائي المعتمد (ر.س)</label>
+                    <input type="number" id="adminCustomPrice" placeholder="اكتب السعر النهائي (مثال: 450)">
+                </div>
+                <div class="form-group">
+                    <label>سبب الرفض (مطلوب في حالة الرفض فقط)</label>
+                    <textarea id="adminRejectReason" placeholder="اكتب سبب الرفض هنا..."></textarea>
                 </div>
 
                 <div class="admin-actions">
-                    <button class="btn btn-approve" onclick="executeAdminAction('accept')">✅ قبول واعتماد الموعد</button>
-                    <button class="btn btn-reject" onclick="executeAdminAction('reject')">❌ رفض وإلغاء الموعد</button>
+                    <button class="btn btn-approve" onclick="executeAdminAction('accept')">✅ قبول الموعد وتثبيت السعر</button>
+                    <button class="btn btn-reject" onclick="executeAdminAction('reject')">❌ رفض الموعد</button>
                 </div>
             </div>
         </section>
@@ -635,7 +774,7 @@
         <div class="footer-content">
             <div class="footer-info">
                 <h4>مركز آدم لخدمات السيارات الفاخرة</h4>
-                <p>قطع غيار وفحص وصيانه وبرمجه جميع سيارات بورش بأحترافيه</p>
+                <p>قطع غيار وفحص وصيانة وبرمجة جميع سيارات بورش باحترافية عالية بالخبر</p>
                 <p class="footer-location">📍 المنطقة الشرقية - الخبر</p>
             </div>
             <div class="footer-social">
@@ -650,7 +789,7 @@
     </footer>
 
     <script>
-        const APPS_SCRIPT_URL ="https://script.google.com/macros/s/AKfycbzEKBBIPLgkPVgmcCaVtSAgWmB7roSNconRT1ocJSIU0vuIVrdvuCsoskfA9cADs7TGtQ/exec";
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzEKBBIPLgkPVgmcCaVtSAgWmB7roSNconRT1ocJSIU0vuIVrdvuCsoskfA9cADs7TGtQ/exec";
         const ADMIN_PASSWORD_PROTECT = "ADAM2026"; 
 
         const porscheImages = [
@@ -675,6 +814,19 @@
             setupDatePickerMin();
             handleServiceFieldsChange();
         };
+
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerText = message;
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 4000);
+        }
+
+        function toggleFaq(element) {
+            element.classList.toggle('active');
+        }
 
         function handleServiceFieldsChange() {
             const selectedService = document.getElementById('bookService').value;
@@ -728,7 +880,7 @@
             const selectedDate = new Date(input.value);
             const dayOfWeek = selectedDate.getUTCDay(); 
             if (dayOfWeek === 5) {
-                alert("نعتذر منك، يوم الجمعة هو الإجازة الأسبوعية لمركز آدم أوتو سيرفس. يرجى اختيار تاريخ آخر.");
+                showToast("نعتذر منك، يوم الجمعة هو الإجازة الأسبوعية لمركز آدم.");
                 input.value = ""; 
             }
         }
@@ -743,10 +895,10 @@
         function startHeroSlider() {
             const heroElement = document.getElementById('hero-slider');
             if(heroElement) {
-                heroElement.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url('${porscheImages[currentImageIndex]}')`;
+                heroElement.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('${porscheImages[currentImageIndex]}')`;
                 setInterval(() => {
                     currentImageIndex = (currentImageIndex + 1) % porscheImages.length;
-                    heroElement.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url('${porscheImages[currentImageIndex]}')`;
+                    heroElement.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('${porscheImages[currentImageIndex]}')`;
                 }, 7000);
             }
         }
@@ -782,7 +934,7 @@
             localStorage.setItem(email, JSON.stringify(userData));
             localStorage.setItem('activeSessionUser', email);
 
-            alert('تم إنشاء حسابك بنجاح!');
+            showToast('تم إنشاء حسابك بنجاح!');
             event.target.reset();
             checkUserSession();
             navigateTo('booking');
@@ -798,21 +950,22 @@
                 const userData = JSON.parse(localData);
                 if (userData.password === passwordInput) {
                     localStorage.setItem('activeSessionUser', email);
-                    alert('تم تسجيل الدخول بنجاح!');
+                    showToast('تم تسجيل الدخول بنجاح!');
                     event.target.reset();
                     checkUserSession();
                     navigateTo('booking');
                 } else {
-                    alert('عذراً، كلمة المرور غير صحيحة.');
+                    showToast('عذراً، كلمة المرور غير صحيحة.');
                 }
             } else {
-                alert('عذراً، هذا البريد الإلكتروني غير مسجل.');
+                showToast('عذراً، هذا البريد الإلكتروني غير مسجل.');
             }
         }
 
         function handleNewBooking(event) {
             event.preventDefault();
 
+            const porscheModel = document.getElementById('porscheModel').value;
             const service = document.getElementById('bookService').value;
             const rawDate = document.getElementById('bookDate').value;
             const time = document.getElementById('bookTime').value;
@@ -823,7 +976,7 @@
             const notesVal = document.getElementById('carNotes').value.trim();
 
             if(!time) {
-                alert("يرجى اختيار وقت مناسب.");
+                showToast("يرجى اختيار وقت مناسب.");
                 return;
             }
             
@@ -840,24 +993,24 @@
                 clientName = document.getElementById('bookGuestName').value.trim();
                 clientPhone = document.getElementById('bookGuestPhone').value.trim();
                 if(!clientName) {
-                    alert("يرجى كتابة اسمك الكريم أولاً.");
+                    showToast("يرجى كتابة اسمك الكريم أولاً.");
                     return;
                 }
                 if(!clientPhone) {
-                    alert("يرجى كتابة رقم جوالك الكريم أولاً.");
+                    showToast("يرجى كتابة رقم جوالك أولاً.");
                     return;
                 }
             }
             
             const generatedInvId = Math.floor(100000 + Math.random() * 900000); 
-            const price = servicesPriceList[service] || '300';
+            const price = servicesPriceList[service] || '350';
 
             if (sessionEmail) {
                 const userData = JSON.parse(localStorage.getItem(sessionEmail));
                 if(!userData.invoices) userData.invoices = [];
                 userData.invoices.push({
                     id: generatedInvId,
-                    service: service,
+                    service: service + ` (${porscheModel})`,
                     date: englishFormattedDate + ' @ ' + time,
                     price: price,
                     status: 'قيد الانتظار',
@@ -869,6 +1022,7 @@
 
             document.getElementById('tickName').innerText = clientName;
             document.getElementById('tickPhone').innerText = clientPhone; 
+            document.getElementById('tickModel').innerText = porscheModel;
             document.getElementById('tickService').innerText = service;
             document.getElementById('tickDateTime').innerText = `${englishFormattedDate} - ${time}`;
             document.getElementById('invId').innerText = generatedInvId;
@@ -876,23 +1030,14 @@
             document.getElementById('tickRejectionReason').style.display = 'none';
 
             const tickDynamicSpecs = document.getElementById('tickDynamicSpecs');
-            if (service === 'تغيير زيت وفلاتر بورش' && vinVal) {
-                tickDynamicSpecs.innerHTML = `⚙️ <strong>رقم الهيكل (VIN):</strong> ${vinVal}`;
-                tickDynamicSpecs.style.display = 'block';
-            } else if (service === 'فحص ما قبل الشراء') {
-                let specHtml = vinVal ? `⚙️ <strong>رقم الهيكل (VIN):</strong> ${vinVal}` : '';
-                if (notesVal) specHtml += `<br>📝 <strong>ملاحظات:</strong> ${notesVal}`;
-                tickDynamicSpecs.innerHTML = specHtml;
-                tickDynamicSpecs.style.display = specHtml ? 'block' : 'none';
-            } else if (service === 'فحص وصيانة ميكانيكية شاملة' && chassisVal && kmVal) {
-                tickDynamicSpecs.innerHTML = `⚙️ <strong>رقم الشاصي:</strong> ${chassisVal} <br> 📊 <strong>الممشى:</strong> ${kmVal} كم`;
-                tickDynamicSpecs.style.display = 'block';
-            } else if (service === 'صيانة عامة وإصلاح ميكانيكي' && vinVal && notesVal) {
-                tickDynamicSpecs.innerHTML = `⚙️ <strong>رقم الهيكل (VIN):</strong> ${vinVal} <br> 📝 <strong>تفاصيل المشكلة:</strong> ${notesVal}`;
-                tickDynamicSpecs.style.display = 'block';
-            } else {
-                tickDynamicSpecs.style.display = 'none';
-            }
+            let specHtml = `🚗 <strong>الطراز:</strong> ${porscheModel}`;
+            if (vinVal) specHtml += `<br>🆔 <strong>VIN:</strong> ${vinVal}`;
+            if (chassisVal) specHtml += `<br>🆔 <strong>الشاصي:</strong> ${chassisVal}`;
+            if (kmVal) specHtml += `<br>📊 <strong>الممشى:</strong> ${kmVal} كم`;
+            if (notesVal) specHtml += `<br>📝 <strong>ملاحظات:</strong> ${notesVal}`;
+            
+            tickDynamicSpecs.innerHTML = specHtml;
+            tickDynamicSpecs.style.display = 'block';
             
             const ticketBox = document.getElementById('appointmentTicket');
             ticketBox.className = "ticket-box status-pending";
@@ -909,35 +1054,29 @@
                 method: "POST",
                 mode: "no-cors",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ action: "create", id: generatedInvId, name: clientName, service: service, date: englishFormattedDate, time: time })
+                body: JSON.stringify({ action: "create", id: generatedInvId, name: clientName, service: service + ` - ${porscheModel}`, date: englishFormattedDate, time: time })
             });
 
-            alert('سيتم فتح الواتساب لإرسال بيانات حجزك للإدارة. ستظل التذكرة قيد الانتظار حتى يعتمدها المسؤول من لوحة الإدارة.');
+            showToast('سيتم فتح الواتساب لإرسال بيانات حجزك للإدارة.');
 
-            let technicalDetailsText = "";
-            if (service === 'تغيير زيت وفلاتر بورش' || service === 'فحص ما قبل الشراء') {
-                if(vinVal) technicalDetailsText += `\n🆔 رقم الهيكل (VIN): ${vinVal}`;
-                if(notesVal) technicalDetailsText += `\n📝 ملاحظات: ${notesVal}`;
-            } else if (service === 'فحص وصيانة ميكانيكية شاملة') {
-                technicalDetailsText = `\n🆔 رقم الشاصي: ${chassisVal}\n📊 الممشى الحالي: ${kmVal} كم`;
-            } else if (service === 'صيانة عامة وإصلاح ميكانيكي') {
-                technicalDetailsText = `\n🆔 رقم الهيكل (VIN): ${vinVal}\n📝 نوع المشكلة: ${notesVal}`;
-            }
+            let technicalDetailsText = `\n🏎️ طراز السيارة: ${porscheModel}`;
+            if(vinVal) technicalDetailsText += `\n🆔 رقم الهيكل: ${vinVal}`;
+            if(chassisVal) technicalDetailsText += `\n🆔 رقم الشاصي: ${chassisVal}`;
+            if(kmVal) technicalDetailsText += `\n📊 الممشى: ${kmVal} كم`;
+            if(notesVal) technicalDetailsText += `\n📝 ملاحظات: ${notesVal}`;
 
             const whatsappMessage = 
-`طلب حجز صيانة جديد قيد المراجعة ⏳
+`طلب حجز صيانة بورش جديد قيد المراجعة ⏳
 
 👤 اسم العميل: ${clientName}
-📞 جوال العميل: ${clientPhone}
-🛠️ نوع الخدمة: ${service}${technicalDetailsText}
+📞 جوال العميل: ${clientPhone}${technicalDetailsText}
+🛠️ الخدمة المطلوبة: ${service}
 📅 تاريخ الموعد: ${englishFormattedDate}
 ⏰ وقت الحجز: ${time}
 
-🧾 تفاصيل الفاتورة المبدئية:
+🧾 الفاتورة المبدئية:
 - رقم الفاتورة: #${generatedInvId}
-- المبلغ المقدر: ${price} ريال قطعي
-
-* لمعالجة هذا الطلب بالقبول أو الرفض، يرجى الانتظار بعض من الوقت.`;
+- المبلغ المقدر: ${price} ريال`;
 
             const targetPhoneNumber = "966547070334";
             window.open(`https://api.whatsapp.com/send?phone=${targetPhoneNumber}&text=${encodeURIComponent(whatsappMessage)}`, '_blank');
@@ -951,48 +1090,50 @@
         function executeAdminAction(actionType) {
             const enteredKey = document.getElementById('adminSecretKey').value;
             const targetInvoiceId = document.getElementById('adminInvoiceId').value.trim();
+            const customPriceVal = document.getElementById('adminCustomPrice').value.trim();
             const rejectReasonText = document.getElementById('adminRejectReason').value.trim();
 
             if (enteredKey !== ADMIN_PASSWORD_PROTECT) {
-                alert("🚫 خطأ: رمز مرور المسؤولين غير صحيح. لا تمتلك صلاحية الاعتماد.");
+                showToast("🚫 خطأ: رمز مرور المسؤولين غير صحيح.");
                 return;
             }
 
             if (!targetInvoiceId) {
-                alert("⚠️ يرجى إدخال رقم الفاتورة المراد معالجتها.");
+                showToast("⚠️ يرجى إدخال رقم الفاتورة.");
                 return;
+            }
+
+            if (actionType === 'accept' && customPriceVal) {
+                document.getElementById('invPrice').innerText = customPriceVal;
+                localStorage.setItem("admin_custom_price_" + targetInvoiceId, customPriceVal);
             }
 
             if (actionType === 'reject' && !rejectReasonText) {
-                alert("⚠️ يرجى كتابة (سبب الرفض) حتى يتمكن العميل من معرفة السبب بوضوح.");
+                showToast("⚠️ يرجى كتابة سبب الرفض.");
                 return;
             }
 
-            // تخزين سبب الرفض محلياً لكي يظهر فوراً في حال كان العميل متصفحاً من نفس المتصفح
             localStorage.setItem("admin_last_reason_" + targetInvoiceId, rejectReasonText);
+            showToast("جاري تنفيذ الإجراء...");
 
-            alert("جاري إرسال القرار وتحديث حالة الطلب...");
-
-            fetch(`${APPS_SCRIPT_URL}?id=${targetInvoiceId}&action=${actionType}&reason=${encodeURIComponent(rejectReasonText)}`, {
+            fetch(`${APPS_SCRIPT_URL}?id=${targetInvoiceId}&action=${actionType}&price=${encodeURIComponent(customPriceVal)}&reason=${encodeURIComponent(rejectReasonText)}`, {
                 method: "GET",
                 mode: "no-cors"
             })
             .then(() => {
-                alert(`🎉 تم تنفيذ أمر الإدارة بـ (${actionType === 'accept' ? 'القبول' : 'الرفض'}) للفاتورة #${targetInvoiceId} بنجاح!`);
+                showToast(`🎉 تم تنفيذ أمر الإدارة بنجاح للفاتورة #${targetInvoiceId}!`);
                 document.getElementById('adminInvoiceId').value = "";
+                document.getElementById('adminCustomPrice').value = "";
                 document.getElementById('adminRejectReason').value = "";
             })
-            .catch(err => {
-                alert("حدثت مشكلة أثناء الاتصال بالسيرفر، يرجى المحاولة لاحقاً.");
+            .catch(() => {
+                showToast("حدثت مشكلة أثناء الاتصال بالسيرفر.");
             });
         }
 
         function checkLiveStatus(id, sessionEmail) {
             fetch(`${APPS_SCRIPT_URL}?id=${id}&action=check`)
-            .then(res => {
-                if (!res.ok) throw new Error("Network response error");
-                return res.json();
-            })
+            .then(res => res.json())
             .then(data => {
                 if (!data || !data.status) return;
 
@@ -1001,17 +1142,23 @@
                 const title = document.getElementById('ticketHeaderTitle');
                 const note = document.getElementById('liveStatusNote');
                 const reasonBox = document.getElementById('tickRejectionReason');
+                const priceSpan = document.getElementById('invPrice');
+
+                const savedCustomPrice = localStorage.getItem("admin_custom_price_" + id);
+                if (savedCustomPrice) {
+                    priceSpan.innerText = savedCustomPrice;
+                }
 
                 if (data.status === "مقبول" || data.status === "accepted") {
                     ticket.className = "ticket-box status-accepted";
-                    title.innerText = "🎉 تم قبول الطلب واعتكاده";
+                    title.innerText = "🎉 تم قبول الطلب واعتماده";
                     title.style.color = "#2e7d32"; 
                     badge.className = "badge-status badge-accepted";
                     badge.innerText = "تم قبول الطلب";
-                    note.innerText = "تم اعتماد الفاتورة والموعد بنجاح من قِبل إدارة مركز آدم. جاهزون لاستقبالك.";
+                    note.innerText = "تم اعتماد الفاتورة والموعد بنجاح من قِبل إدارة مركز آدم.";
                     reasonBox.style.display = 'none';
                     
-                    if(sessionEmail) updateLocalInvoiceStatus(id, "مقبول", "", sessionEmail);
+                    if(sessionEmail) updateLocalInvoiceStatus(id, "مقبول", "", savedCustomPrice, sessionEmail);
                     clearInterval(checkInterval);
                     
                 } else if (data.status === "mrefod" || data.status === "مرفوض" || data.status === "rejected") {
@@ -1020,21 +1167,23 @@
                     title.style.color = "#c62828";
                     badge.className = "badge-status badge-rejected";
                     badge.innerText = "تم رفض الطلب";
-                    note.innerText = "عذراً، الموعد أو الخدمة غير متوفرة في الوقت الحالي، يرجى اختيار توقيت آخر.";
+                    note.innerText = "عذراً، الموعد أو الخدمة غير متوفرة حالياً.";
                     
-                    // جلب سبب الرفض بدقة من السيرفر أو التخزين المحلي المؤقت
                     const localSavedReason = localStorage.getItem("admin_last_reason_" + id);
-                    const reasonText = data.reason || localSavedReason || "عذراً، تم إلغاء الموعد من قِبل الإدارة لعدم توفر أوقات شاغرة.";
+                    const reasonText = data.reason || localSavedReason || "عذراً، تم إلغاء الموعد من قِبل الإدارة.";
                     
                     reasonBox.innerHTML = `<strong>🚫 سبب الرفض:</strong> ${reasonText}`;
                     reasonBox.style.display = 'block';
 
-                    if(sessionEmail) updateLocalInvoiceStatus(id, "مرفوض", reasonText, sessionEmail);
+                    if(sessionEmail) updateLocalInvoiceStatus(id, "مرفوض", reasonText, savedCustomPrice, sessionEmail);
                     clearInterval(checkInterval);
                 }
-            }).catch(err => {
-                // بديل احتياطي فوري في حال لم يرجع السيرفر بالبيانات بالسرعة الكافية
+            }).catch(() => {
                 const localSavedReason = localStorage.getItem("admin_last_reason_" + id);
+                const savedCustomPrice = localStorage.getItem("admin_custom_price_" + id);
+                if(savedCustomPrice) {
+                    document.getElementById('invPrice').innerText = savedCustomPrice;
+                }
                 if(localSavedReason) {
                     const ticket = document.getElementById('appointmentTicket');
                     const badge = document.getElementById('liveStatusBadge');
@@ -1049,19 +1198,20 @@
                     
                     reasonBox.innerHTML = `<strong>🚫 سبب الرفض:</strong> ${localSavedReason}`;
                     reasonBox.style.display = 'block';
-                    if(sessionEmail) updateLocalInvoiceStatus(id, "مرفوض", localSavedReason, sessionEmail);
+                    if(sessionEmail) updateLocalInvoiceStatus(id, "مرفوض", localSavedReason, savedCustomPrice, sessionEmail);
                     clearInterval(checkInterval);
                 }
             });
         }
 
-        function updateLocalInvoiceStatus(id, newStatus, reason, email) {
+        function updateLocalInvoiceStatus(id, newStatus, reason, customPrice, email) {
             const userData = JSON.parse(localStorage.getItem(email));
             if (userData && userData.invoices) {
                 userData.invoices = userData.invoices.map(inv => {
                     if(inv.id == id) {
                         inv.status = newStatus;
                         inv.reason = reason;
+                        if(customPrice) inv.price = customPrice;
                     }
                     return inv;
                 });
@@ -1089,7 +1239,7 @@
                 let reasonHtml = inv.reason ? `<div style="color:#ff6b6b; margin-top:2px;">السبب: ${inv.reason}</div>` : '';
 
                 item.innerHTML = `
-                    <div><strong>فاتورة #${inv.id}</strong> - ${inv.price} ريال <span style="color:${statusColor}; font-size:10px;">(${inv.status || 'قيد الانتظار'})</span></div>
+                    <div><strong>فاتورة #${inv.id}</strong> - ${inv.price} ر.س <span style="color:${statusColor}; font-size:10px;">(${inv.status || 'قيد الانتظار'})</span></div>
                     <div style="color:#aaa;">الخدمة: ${inv.service}</div>
                     ${reasonHtml}
                     <div style="color:#888; direction: ltr; text-align: right;">التاريخ: ${inv.date}</div>
@@ -1138,7 +1288,7 @@
             localStorage.removeItem('activeSessionUser');
             if(document.getElementById('appointmentTicket')) document.getElementById('appointmentTicket').style.display = "none";
             if(checkInterval) clearInterval(checkInterval);
-            alert('تم تسجيل الخروج بنجاح.');
+            showToast('تم تسجيل الخروج بنجاح.');
             checkUserSession();
             navigateTo('home');
         }
