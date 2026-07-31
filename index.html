@@ -495,7 +495,7 @@
                         <h3>تغيير الزيت</h3>
                         <p>نستخدم أفضل الزيوت المعتمدة والموصى بها من المصنع لضمان سلاسة وحماية المحرك.</p>
                     </div>
-                    <button class="service-book-btn" onclick="quickBook('تغيير زيت وفلاتر بورش')">حجز موعد (450 ر.س)</button>
+                    <button class="service-book-btn" onclick="quickBook('تغيير زيت وفلاتر بورش')">حجز موعد</button>
                 </div>
                 <div class="service-card">
                     <div>
@@ -503,7 +503,7 @@
                         <h3>فحص ما قبل الشراء</h3>
                         <p>فحص شامل دقيق ومفصل لمحرك وبدي وأنظمة سيارة بورش قبل إتمام شرائها لتكون في اطمئنان تام.</p>
                     </div>
-                    <button class="service-book-btn" onclick="quickBook('فحص ما قبل الشراء')">حجز موعد (500 ر.س)</button>
+                    <button class="service-book-btn" onclick="quickBook('فحص ما قبل الشراء')">حجز موعد</button>
                 </div>
                 <div class="service-card">
                     <div>
@@ -511,7 +511,7 @@
                         <h3>الصيانة الدورية</h3>
                         <p>فحص ميكانيكي وكهربائي دقيق وشامل لجميع أجزاء السيارة بأحدث الأجهزة المخصصة.</p>
                     </div>
-                    <button class="service-book-btn" onclick="quickBook('فحص وصيانة ميكانيكية شاملة')">حجز موعد (350 ر.س)</button>
+                    <button class="service-book-btn" onclick="quickBook('فحص وصيانة ميكانيكية شاملة')">حجز موعد</button>
                 </div>
                 <div class="service-card">
                     <div>
@@ -519,7 +519,7 @@
                         <h3>صيانة عامة</h3>
                         <p>إصلاح الأنظمة الميكانيكية والمعقدة، والتربيط، ومعالجة كافة المشاكل والعيوب المصنعية باحترافية.</p>
                     </div>
-                    <button class="service-book-btn" onclick="quickBook('صيانة عامة وإصلاح ميكانيكي')">حجز موعد (600 ر.س)</button>
+                    <button class="service-book-btn" onclick="quickBook('صيانة عامة وإصلاح ميكانيكي')">حجز موعد</button>
                 </div>
                 <div class="service-card">
                     <div>
@@ -527,7 +527,7 @@
                         <h3>برمجة وفحص كمبيوتر</h3>
                         <p>تحديث الأنظمة، قراءة الأعطال بدقة، وبرمجة كاملة لجميع كمبيوترات سيارات بورش.</p>
                     </div>
-                    <button class="service-book-btn" onclick="quickBook('برمجة وفحص كمبيوتر متطور')">حجز موعد (250 ر.س)</button>
+                    <button class="service-book-btn" onclick="quickBook('برمجة وفحص كمبيوتر متطور')">حجز موعد</button>
                 </div>
             </div>
         </div>
@@ -593,11 +593,11 @@
                     <div class="form-group">
                         <label>نوع الخدمة المطلوبة</label>
                         <select id="bookService" onchange="handleServiceFieldsChange()" required>
-                            <option value="تغيير زيت وفلاتر بورش">تغيير زيت وفلاتر (450 ر.س)</option>
-                            <option value="فحص ما قبل الشراء">فحص ما قبل الشراء (500 ر.س)</option>
-                            <option value="فحص وصيانة ميكانيكية شاملة">فحص وصيانة شاملة (350 ر.س)</option>
-                            <option value="صيانة عامة وإصلاح ميكانيكي">صيانة عامة وإصلاح (600 ر.س)</option>
-                            <option value="برمجة وفحص كمبيوتر متطور">برمجة وفحص كمبيوتر (250 ر.س)</option>
+                            <option value="تغيير زيت وفلاتر بورش">تغيير زيت وفلاتر</option>
+                            <option value="فحص ما قبل الشراء">فحص ما قبل الشراء</option>
+                            <option value="فحص وصيانة ميكانيكية شاملة">فحص وصيانة شاملة</option>
+                            <option value="صيانة عامة وإصلاح ميكانيكي">صيانة عامة وإصلاح</option>
+                            <option value="برمجة وفحص كمبيوتر متطور">برمجة وفحص كمبيوتر</option>
                         </select>
                     </div>
 
@@ -676,7 +676,7 @@
                             <span id="liveStatusBadge" class="badge-status badge-pending">في انتظار قرار الإدارة...</span>
                         </div>
                         <div class="ticket-item" style="font-size:12px; margin-top:8px;"><strong>البيان:</strong> صيانة متخصصة لسيارات بورش</div>
-                        <div class="ticket-item" style="font-size:12px;"><strong>السعر النهائي المعتمد:</strong> <span id="invPrice" style="font-weight:bold; color:var(--porsche-orange);">0</span> ريال قطعي</div>
+                        <div class="ticket-item" style="font-size:12px;"><strong>السعر النهائي المعتمد:</strong> <span id="invPrice" style="font-weight:bold; color:var(--porsche-orange);">يحدد لاحقاً من الإدارة</span></div>
                         <div class="ticket-item" id="tickRejectionReason" style="font-size:11px; color:#c62828; margin-top:6px; display:none; background:#ffcdd2; padding:5px; border-radius:3px;"></div>
                         <div class="ticket-item" style="font-size:11px; color:#444; font-weight: bold; margin-top: 8px; text-align: center;" id="liveStatusNote">
                             * يقوم المسؤول الفني بالمركز الآن بمراجعة طلب الحجز وتأكيده عبر النظام الإداري.
@@ -799,14 +799,6 @@
         
         let currentImageIndex = 0;
         let checkInterval = null;
-
-        const servicesPriceList = {
-            'تغيير زيت وفلاتر بورش': '450',
-            'فحص ما قبل الشراء': '500',
-            'فحص وصيانة ميكانيكية شاملة': '350',
-            'صيانة عامة وإصلاح ميكانيكي': '600',
-            'برمجة وفحص كمبيوتر متطور': '250'
-        };
 
         window.onload = function() {
             checkUserSession();
@@ -1003,7 +995,7 @@
             }
             
             const generatedInvId = Math.floor(100000 + Math.random() * 900000); 
-            const price = servicesPriceList[service] || '350';
+            const defaultDisplayPrice = "يحدد من الإدارة";
 
             if (sessionEmail) {
                 const userData = JSON.parse(localStorage.getItem(sessionEmail));
@@ -1012,7 +1004,7 @@
                     id: generatedInvId,
                     service: service + ` (${porscheModel})`,
                     date: englishFormattedDate + ' @ ' + time,
-                    price: price,
+                    price: defaultDisplayPrice,
                     status: 'قيد الانتظار',
                     reason: ''
                 });
@@ -1026,7 +1018,7 @@
             document.getElementById('tickService').innerText = service;
             document.getElementById('tickDateTime').innerText = `${englishFormattedDate} - ${time}`;
             document.getElementById('invId').innerText = generatedInvId;
-            document.getElementById('invPrice').innerText = price;
+            document.getElementById('invPrice').innerText = defaultDisplayPrice;
             document.getElementById('tickRejectionReason').style.display = 'none';
 
             const tickDynamicSpecs = document.getElementById('tickDynamicSpecs');
@@ -1076,7 +1068,7 @@
 
 🧾 الفاتورة المبدئية:
 - رقم الفاتورة: #${generatedInvId}
-- المبلغ المقدر: ${price} ريال`;
+- السعر: قيد التحديد من الإدارة`;
 
             const targetPhoneNumber = "966547070334";
             window.open(`https://api.whatsapp.com/send?phone=${targetPhoneNumber}&text=${encodeURIComponent(whatsappMessage)}`, '_blank');
@@ -1104,8 +1096,8 @@
             }
 
             if (actionType === 'accept' && customPriceVal) {
-                document.getElementById('invPrice').innerText = customPriceVal;
-                localStorage.setItem("admin_custom_price_" + targetInvoiceId, customPriceVal);
+                document.getElementById('invPrice').innerText = customPriceVal + " ريال قطعي";
+                localStorage.setItem("admin_custom_price_" + targetInvoiceId, customPriceVal + " ريال قطعي");
             }
 
             if (actionType === 'reject' && !rejectReasonText) {
@@ -1239,7 +1231,7 @@
                 let reasonHtml = inv.reason ? `<div style="color:#ff6b6b; margin-top:2px;">السبب: ${inv.reason}</div>` : '';
 
                 item.innerHTML = `
-                    <div><strong>فاتورة #${inv.id}</strong> - ${inv.price} ر.س <span style="color:${statusColor}; font-size:10px;">(${inv.status || 'قيد الانتظار'})</span></div>
+                    <div><strong>فاتورة #${inv.id}</strong> - ${inv.price} <span style="color:${statusColor}; font-size:10px;">(${inv.status || 'قيد الانتظار'})</span></div>
                     <div style="color:#aaa;">الخدمة: ${inv.service}</div>
                     ${reasonHtml}
                     <div style="color:#888; direction: ltr; text-align: right;">التاريخ: ${inv.date}</div>
