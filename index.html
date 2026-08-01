@@ -377,6 +377,590 @@
             .logo { font-size: 22px; }
         }
     </style>
+
+    <!-- استدعاء حزم Firebase عبر CDN -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // استبدل البيانات التالية ببيانات مشروعك الفعلية من لوحة تحكم Firebase
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const porscheImages = [
+            'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=1920&q=80',
+            'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1920&q=80',
+        ];
+        
+        let currentImageIndex = 0;
+        let checkInterval = null;
+
+        window.onload = function() {
+            checkUserSession();
+            startHeroSlider();
+            setupDatePickerMin();
+            handleServiceFieldsChange();
+        };
+
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            if(!container) return;
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerText = message;
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 4000);
+        }
+
+        window.toggleFaq = function(element) {
+            element.classList.toggle('active');
+        }
+
+        // دالة فحص كلمة المرور للوحة الإدارة
+        window.checkAdminPassword = function() {
+            const password = prompt("🔐 يرجى إدخال كلمة مرور لوحة الإدارة:");
+            if (password === "ADAM2030") {
+                showToast("تم التحقق بنجاح، جاري فتح لوحة الإدارة...");
+                navigateTo('admin');
+            } else if (password !== null) {
+                showToast("❌ كلمة المرور غير صحيحة!");
+            }
+        }
+
+        window.handleServiceFieldsChange = function() {
+            const selectedService = document.getElementById('bookService').value;
+            const vinGroup = document.getElementById('field-vin-group');
+            const chassisGroup = document.getElementById('field-chassis-group');
+            const kmGroup = document.getElementById('field-km-group');
+            const notesGroup = document.getElementById('field-notes-group');
+
+            const vinInput = document.getElementById('carVin');
+            const chassisInput = document.getElementById('carChassis');
+            const kmInput = document.getElementById('carKm');
+            const notesInput = document.getElementById('carNotes');
+
+            vinInput.removeAttribute('required');
+            chassisInput.removeAttribute('required');
+            kmInput.removeAttribute('required');
+            notesInput.removeAttribute('required');
+            
+            vinGroup.style.display = 'none';
+            chassisGroup.style.display = 'none';
+            kmGroup.style.display = 'none';
+            notesGroup.style.display = 'none';
+
+            if (selectedService === 'تغيير زيت وفلاتر بورش') {
+                vinGroup.style.display = 'block';
+                vinInput.setAttribute('required', 'true');
+            } else if (selectedService === 'فحص ما قبل الشراء') {
+                vinGroup.style.display = 'block';
+                notesGroup.style.display = 'block';
+                vinInput.setAttribute('required', 'true');
+            } else if (selectedService === 'فحص وصيانة ميكانيكية شاملة') {
+                chassisGroup.style.display = 'block';
+                kmGroup.style.display = 'block';
+                chassisInput.setAttribute('required', 'true');
+                kmInput.setAttribute('required', 'true');
+            } else if (selectedService === 'صيانة عامة وإصلاح ميكانيكي') {
+                vinGroup.style.display = 'block';
+                notesGroup.style.display = 'block';
+                vinInput.setAttribute('required', 'true');
+                notesInput.setAttribute('required', 'true');
+            }
+        }
+
+        function setupDatePickerMin() {
+            const today = new Date().toISOString().split('T')[0];
+            const dateInput = document.getElementById('bookDate');
+            if(dateInput) dateInput.setAttribute('min', today);
+        }
+
+        window.validateWorkDay = function(input) {
+            if(!input.value) return;
+            const selectedDate = new Date(input.value);
+            const dayOfWeek = selectedDate.getUTCDay(); 
+            if (dayOfWeek === 5) {
+                showToast("نعتذر منك، يوم الجمعة هو الإجازة الأسبوعية لمركز آدم.");
+                input.value = ""; 
+            }
+        }
+
+        function formatEnglishDate(dateString) {
+            if(!dateString) return "";
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const dateObj = new Date(dateString);
+            return dateObj.toLocaleDateString('en-US', options);
+        }
+
+        function startHeroSlider() {
+            const heroElement = document.getElementById('hero-slider');
+            if(heroElement) {
+                heroElement.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('${porscheImages[currentImageIndex]}')`;
+                setInterval(() => {
+                    currentImageIndex = (currentImageIndex + 1) % porscheImages.length;
+                    heroElement.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('${porscheImages[currentImageIndex]}')`;
+                }, 7000);
+            }
+        }
+
+        window.navigateTo = function(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+            document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+            
+            const targetPage = document.getElementById(`page-${pageId}`);
+            const targetNav = document.getElementById(`nav-${pageId}`);
+            
+            if(targetPage) targetPage.classList.add('active-page');
+            if(targetNav) targetNav.classList.add('active');
+            
+            if (pageId === 'admin') {
+                loadAdminBookings();
+            }
+
+            const dropdownMenu = document.getElementById('profileDropdownMenu');
+            if(dropdownMenu) dropdownMenu.classList.remove('show');
+            window.scrollTo(0, 0);
+        }
+
+        window.quickBook = function(serviceValue) {
+            navigateTo('booking');
+            document.getElementById('bookService').value = serviceValue;
+            handleServiceFieldsChange();
+        }
+
+        window.handleRegister = function(event) {
+            event.preventDefault();
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value.toLowerCase();
+            const phone = document.getElementById('regPhone').value;
+            const password = document.getElementById('regPassword').value;
+
+            const userData = { name, email, phone, password, invoices: [] };
+            localStorage.setItem(email, JSON.stringify(userData));
+            localStorage.setItem('activeSessionUser', email);
+
+            showToast('تم إنشاء حسابك بنجاح!');
+            event.target.reset();
+            checkUserSession();
+            navigateTo('booking');
+        }
+
+        window.handleLogin = function(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value.toLowerCase();
+            const passwordInput = document.getElementById('loginPassword').value;
+            const localData = localStorage.getItem(email);
+
+            if (localData) {
+                const userData = JSON.parse(localData);
+                if (userData.password === passwordInput) {
+                    localStorage.setItem('activeSessionUser', email);
+                    showToast('تم تسجيل الدخول بنجاح!');
+                    event.target.reset();
+                    checkUserSession();
+                    navigateTo('booking');
+                } else {
+                    showToast('عذراً، كلمة المرور غير صحيحة.');
+                }
+            } else {
+                showToast('عذراً، هذا البريد الإلكتروني غير مسجل.');
+            }
+        }
+
+        // إرسال الحجز وربطه بـ Firebase Firestore
+        window.handleNewBooking = async function(event) {
+            event.preventDefault();
+
+            const porscheModel = document.getElementById('porscheModel').value;
+            const service = document.getElementById('bookService').value;
+            const rawDate = document.getElementById('bookDate').value;
+            const time = document.getElementById('bookTime').value;
+
+            const vinVal = document.getElementById('carVin').value.trim();
+            const chassisVal = document.getElementById('carChassis').value.trim();
+            const kmVal = document.getElementById('carKm').value.trim();
+            const notesVal = document.getElementById('carNotes').value.trim();
+
+            if(!time) {
+                showToast("يرجى اختيار وقت مناسب.");
+                return;
+            }
+            
+            const englishFormattedDate = formatEnglishDate(rawDate);
+            let clientName = "";
+            let clientPhone = "";
+            const sessionEmail = localStorage.getItem('activeSessionUser');
+            
+            if (sessionEmail) {
+                const userData = JSON.parse(localStorage.getItem(sessionEmail));
+                clientName = userData.name;
+                clientPhone = userData.phone;
+            } else {
+                clientName = document.getElementById('bookGuestName').value.trim();
+                clientPhone = document.getElementById('bookGuestPhone').value.trim();
+                if(!clientName) {
+                    showToast("يرجى كتابة اسمك الكريم أولاً.");
+                    return;
+                }
+                if(!clientPhone) {
+                    showToast("يرجى كتابة رقم جوالك أولاً.");
+                    return;
+                }
+            }
+            
+            const generatedInvId = Math.floor(100000 + Math.random() * 900000); 
+            const defaultDisplayPrice = "يحدد من الإدارة";
+
+            const newBookingItem = {
+                id: generatedInvId,
+                clientName: clientName,
+                clientPhone: clientPhone,
+                carModel: porscheModel,
+                serviceType: service,
+                date: englishFormattedDate,
+                time: time,
+                status: 'قيد الانتظار',
+                price: defaultDisplayPrice,
+                reason: '',
+                clientEmail: sessionEmail || '',
+                createdAt: Date.now()
+            };
+
+            try {
+                // حفظ البيانات في قاعدة بيانات Firebase Firestore
+                await addDoc(collection(db, "bookings"), newBookingItem);
+            } catch (error) {
+                console.error("خطأ في حفظ الحجز بقاعدة البيانات:", error);
+                showToast("حدث خطأ أثناء الاتصال بقاعدة البيانات.");
+                return;
+            }
+
+            if (sessionEmail) {
+                const userData = JSON.parse(localStorage.getItem(sessionEmail));
+                if(!userData.invoices) userData.invoices = [];
+                userData.invoices.push({
+                    id: generatedInvId,
+                    service: service + ` (${porscheModel})`,
+                    date: englishFormattedDate + ' @ ' + time,
+                    price: defaultDisplayPrice,
+                    status: 'قيد الانتظار',
+                    reason: ''
+                });
+                localStorage.setItem(sessionEmail, JSON.stringify(userData));
+                updateInvoiceHistoryDOM(userData.invoices);
+            }
+
+            document.getElementById('tickName').innerText = clientName;
+            document.getElementById('tickPhone').innerText = clientPhone; 
+            document.getElementById('tickModel').innerText = porscheModel;
+            document.getElementById('tickService').innerText = service;
+            document.getElementById('tickDateTime').innerText = `${englishFormattedDate} - ${time}`;
+            document.getElementById('invId').innerText = generatedInvId;
+            document.getElementById('invPrice').innerText = defaultDisplayPrice;
+            document.getElementById('tickRejectionReason').style.display = 'none';
+
+            const tickDynamicSpecs = document.getElementById('tickDynamicSpecs');
+            let specHtml = `🚗 <strong>الطراز:</strong> ${porscheModel}`;
+            if (vinVal) specHtml += `<br>🆔 <strong>VIN:</strong> ${vinVal}`;
+            if (chassisVal) specHtml += `<br>🆔 <strong>الشاصي:</strong> ${chassisVal}`;
+            if (kmVal) specHtml += `<br>📊 <strong>الممشى:</strong> ${kmVal} كم`;
+            if (notesVal) specHtml += `<br>📝 <strong>ملاحظات:</strong> ${notesVal}`;
+            
+            tickDynamicSpecs.innerHTML = specHtml;
+            tickDynamicSpecs.style.display = 'block';
+            
+            const ticketBox = document.getElementById('appointmentTicket');
+            ticketBox.className = "ticket-box status-pending";
+            ticketBox.style.display = "block";
+            
+            document.getElementById('liveStatusBadge').className = "badge-status badge-pending";
+            document.getElementById('liveStatusBadge').innerText = "في انتظار قرار الإدارة...";
+            
+            const mainTitle = document.getElementById('ticketHeaderTitle');
+            mainTitle.innerText = "⏳ حالة الطلب: قيد الانتظار والمراجعة";
+            mainTitle.style.color = "#333"; 
+
+            showToast('تم إرسال طلب الحجز بنجاح وإضافته للوحة تحكم الإدارة!');
+
+            let technicalDetailsText = `\n🏎️ طراز السيارة: ${porscheModel}`;
+            if(vinVal) technicalDetailsText += `\n🆔 رقم الهيكل: ${vinVal}`;
+            if(chassisVal) technicalDetailsText += `\n🆔 رقم الشاصي: ${chassisVal}`;
+            if(kmVal) technicalDetailsText += `\n📊 الممشى: ${kmVal} كم`;
+            if(notesVal) technicalDetailsText += `\n📝 ملاحظات: ${notesVal}`;
+
+            const whatsappMessage = 
+`طلب حجز صيانة بورش جديد قيد المراجعة ⏳
+
+👤 اسم العميل: ${clientName}
+📞 جوال العميل: ${clientPhone}${technicalDetailsText}
+🛠️ الخدمة المطلوبة: ${service}
+📅 تاريخ الموعد: ${englishFormattedDate}
+⏰ وقت الحجز: ${time}
+
+🧾 الفاتورة المبدئية:
+- رقم الفاتورة: #${generatedInvId}
+- السعر: قيد التحديد من الإدارة`;
+
+            const targetPhoneNumber = "966547070334";
+            window.open(`https://api.whatsapp.com/send?phone=${targetPhoneNumber}&text=${encodeURIComponent(whatsappMessage)}`, '_blank');
+
+            if(checkInterval) clearInterval(checkInterval);
+            checkInterval = setInterval(() => {
+                checkLiveStatus(generatedInvId);
+            }, 4000);
+        }
+
+        // جلب الحجوزات لعرضها في لوحة تحكم المسؤول من Firebase
+        window.loadAdminBookings = async function() {
+            const tableBody = document.getElementById('bookingsTableBody');
+            if(!tableBody) return;
+            tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#aaa;">جاري جلب الطلبات من قاعدة البيانات...</td></tr>';
+
+            try {
+                const querySnapshot = await getDocs(collection(db, "bookings"));
+                tableBody.innerHTML = '';
+
+                if (querySnapshot.empty) {
+                    tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#aaa;">لا توجد طلبات حجز واردة حالياً</td></tr>';
+                    return;
+                }
+
+                let index = 0;
+                querySnapshot.forEach((docSnap) => {
+                    const booking = docSnap.data();
+                    const docId = docSnap.id;
+
+                    let badgeClass = 'badge-pending';
+                    let statusText = booking.status || 'قيد الانتظار';
+                    if (statusText === 'مقبول') badgeClass = 'badge-accepted';
+                    if (statusText === 'مرفوض') badgeClass = 'badge-rejected';
+
+                    let reasonDisplay = booking.reason ? `<div style="color:#ff6b6b; font-size:11px; margin-top:4px;">السبب: ${booking.reason}</div>` : '';
+
+                    const row = document.createElement('tr');
+                    row.style.borderBottom = '1px solid #333';
+                    row.innerHTML = `
+                        <td style="padding: 12px; border: 1px solid #444; font-weight:bold;">#${booking.id}</td>
+                        <td style="padding: 12px; border: 1px solid #444;">
+                            <strong>${booking.clientName}</strong><br>
+                            <small style="color: #aaa; direction:ltr; display:inline-block;">📞 ${booking.clientPhone}</small><br>
+                            <small style="color: var(--porsche-orange);">${booking.carModel}</small>
+                        </td>
+                        <td style="padding: 12px; border: 1px solid #444;">
+                            ${booking.serviceType}<br>
+                            <small style="color: #ccc;">📅 ${booking.date} - ${booking.time}</small><br>
+                            <small style="color: #4db6ac;">💰 ${booking.price || 'يحدد لاحقاً'}</small>
+                        </td>
+                        <td style="padding: 12px; border: 1px solid #444;">
+                            <span class="badge-status ${badgeClass}">${statusText}</span>
+                            ${reasonDisplay}
+                        </td>
+                        <td style="padding: 12px; border: 1px solid #444; text-align: center;">
+                            <div style="margin-bottom: 6px;">
+                                <input type="text" id="priceInput_${index}" placeholder="السعر (ر.س)" style="padding:4px; width:90px; background:#222; color:white; border:1px solid #555; font-size:12px; border-radius:3px;" value="${booking.price && booking.price !== 'يحدد من الإدارة' ? booking.price : ''}">
+                            </div>
+                            <div style="margin-bottom: 6px;">
+                                <input type="text" id="reasonInput_${index}" placeholder="سبب الرفض" style="padding:4px; width:130px; background:#222; color:white; border:1px solid #555; font-size:12px; border-radius:3px;" value="${booking.reason || ''}">
+                            </div>
+                            <button class="btn btn-approve" style="padding: 5px 10px; font-size:12px; margin-bottom:4px; width:auto;" onclick="adminUpdateBookingStatus('${docId}', ${index}, 'مقبول')">✅ قبول</button>
+                            <button class="btn btn-reject" style="padding: 5px 10px; font-size:12px; width:auto;" onclick="adminUpdateBookingStatus('${docId}', ${index}, 'مرفوض')">❌ رفض</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                    index++;
+                });
+            } catch (error) {
+                console.error("خطأ في جلب البيانات:", error);
+                tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#ff5500;">حدث خطأ أثناء تحميل الطلبات من Firebase.</td></tr>';
+            }
+        }
+
+        // تحديث حالة الطلب في قاعدة بيانات Firebase
+        window.adminUpdateBookingStatus = async function(docId, index, newStatus) {
+            let priceInputVal = document.getElementById(`priceInput_${index}`).value.trim();
+            let reasonInputVal = document.getElementById(`reasonInput_${index}`).value.trim();
+
+            let finalPrice = "يحدد من الإدارة";
+            let finalReason = "";
+
+            if (newStatus === 'مقبول') {
+                if (priceInputVal) {
+                    finalPrice = priceInputVal;
+                } else {
+                    finalPrice = "معتمد بدون سعر محدد";
+                }
+            }
+
+            if (newStatus === 'مرفوض') {
+                if(!reasonInputVal) {
+                    showToast("⚠️ يرجى كتابة سبب الرفض في الخانة المخصصة.");
+                    return;
+                }
+                finalReason = reasonInputVal;
+            }
+
+            try {
+                const docRef = doc(db, "bookings", docId);
+                await updateDoc(docRef, { 
+                    status: newStatus,
+                    price: finalPrice,
+                    reason: finalReason
+                });
+
+                showToast(`تم تحديث الحالة إلى (${newStatus}) بنجاح!`);
+                loadAdminBookings();
+            } catch (error) {
+                console.error("خطأ في تحديث الحالة:", error);
+                showToast("تعذر تحديث الحالة في قاعدة البيانات.");
+            }
+        }
+
+        // تتبع حالة الطلب للعميل عبر Firebase
+        async function checkLiveStatus(targetInvId) {
+            try {
+                const q = query(collection(db, "bookings"), where("id", "==", targetInvId));
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) return;
+
+                querySnapshot.forEach((docSnap) => {
+                    const currentBooking = docSnap.data();
+
+                    const ticket = document.getElementById('appointmentTicket');
+                    const badge = document.getElementById('liveStatusBadge');
+                    const title = document.getElementById('ticketHeaderTitle');
+                    const note = document.getElementById('liveStatusNote');
+                    const reasonBox = document.getElementById('tickRejectionReason');
+                    const priceSpan = document.getElementById('invPrice');
+
+                    if (currentBooking.price) {
+                        priceSpan.innerText = currentBooking.price;
+                    }
+
+                    if (currentBooking.status === "مقبول") {
+                        ticket.className = "ticket-box status-accepted";
+                        title.innerText = "🎉 تم قبول الطلب واعتماده";
+                        title.style.color = "#2e7d32"; 
+                        badge.className = "badge-status badge-accepted";
+                        badge.innerText = "تم قبول الطلب";
+                        note.innerText = "تم اعتماد الفاتورة والموعد بنجاح من قِبل إدارة مركز آدم.";
+                        reasonBox.style.display = 'none';
+                        clearInterval(checkInterval);
+                        
+                    } else if (currentBooking.status === "مرفوض") {
+                        ticket.className = "ticket-box status-rejected";
+                        title.innerText = "❌ تم رفض الطلب";
+                        title.style.color = "#c62828";
+                        badge.className = "badge-status badge-rejected";
+                        badge.innerText = "تم رفض الطلب";
+                        note.innerText = "عذراً، الموعد أو الخدمة غير متوفرة حالياً.";
+                        
+                        reasonBox.innerHTML = `<strong>🚫 سبب الرفض:</strong> ${currentBooking.reason || "عذراً، تم إلغاء الموعد من قِبل الإدارة."}`;
+                        reasonBox.style.display = 'block';
+                        clearInterval(checkInterval);
+                    }
+                });
+            } catch (e) {
+                console.error("خطأ في تتبع الحالة:", e);
+            }
+        }
+
+        function updateInvoiceHistoryDOM(invoices) {
+            const container = document.getElementById('invoiceHistoryContainer');
+            if(!container) return;
+            if (!invoices || invoices.length === 0) {
+                container.innerHTML = '<span style="font-size: 11px; color:#777;">لا يوجد فواتير صادرة حالياً.</span>';
+                return;
+            }
+
+            container.innerHTML = '';
+            invoices.forEach(inv => {
+                const item = document.createElement('div');
+                item.className = 'invoice-item';
+                let statusColor = "#ff9800";
+                if(inv.status === "مقبول") statusColor = "#4caf50";
+                if(inv.status === "مرفوض") statusColor = "#f44336";
+
+                let reasonHtml = inv.reason ? `<div style="color:#ff6b6b; margin-top:2px;">السبب: ${inv.reason}</div>` : '';
+
+                item.innerHTML = `
+                    <div><strong>فاتورة #${inv.id}</strong> - ${inv.price} <span style="color:${statusColor}; font-size:10px;">(${inv.status || 'قيد الانتظار'})</span></div>
+                    <div style="color:#aaa;">الخدمة: ${inv.service}</div>
+                    ${reasonHtml}
+                    <div style="color:#888; direction: ltr; text-align: right;">التاريخ: ${inv.date}</div>
+                `;
+                container.prepend(item); 
+            });
+        }
+
+        function checkUserSession() {
+            const sessionEmail = localStorage.getItem('activeSessionUser');
+            const menuLogin = document.getElementById('menu-login');
+            const menuRegister = document.getElementById('menu-register');
+            const profileArea = document.getElementById('userProfileArea');
+            const guestNameGroup = document.getElementById('guestNameGroup');
+            const guestPhoneGroup = document.getElementById('guestPhoneGroup');
+
+            if (sessionEmail) {
+                const userData = JSON.parse(localStorage.getItem(sessionEmail));
+                if(menuLogin) menuLogin.style.display = 'none';
+                if(menuRegister) menuRegister.style.display = 'none';
+                if(guestNameGroup) guestNameGroup.style.display = 'none';
+                if(guestPhoneGroup) guestPhoneGroup.style.display = 'none';
+                
+                if(profileArea) profileArea.style.display = 'block';
+                document.getElementById('userBadgeName').innerText = userData.name;
+                document.getElementById('storedName').innerText = userData.name;
+                document.getElementById('storedEmail').innerText = userData.email;
+                document.getElementById('storedPhone').innerText = userData.phone;
+
+                updateInvoiceHistoryDOM(userData.invoices);
+            } else {
+                if(menuLogin) menuLogin.style.display = 'block';
+                if(menuRegister) menuRegister.style.display = 'block';
+                if(guestNameGroup) guestNameGroup.style.display = 'block';
+                if(guestPhoneGroup) guestPhoneGroup.style.display = 'block';
+                if(profileArea) profileArea.style.display = 'none';
+            }
+        }
+
+        window.toggleDropdown = function(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('profileDropdownMenu');
+            if(dropdown) dropdown.classList.toggle('show');
+        }
+
+        window.logoutUser = function() {
+            localStorage.removeItem('activeSessionUser');
+            const ticket = document.getElementById('appointmentTicket');
+            if(ticket) ticket.style.display = "none";
+            if(checkInterval) clearInterval(checkInterval);
+            showToast('تم تسجيل الخروج بنجاح.');
+            checkUserSession();
+            navigateTo('home');
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.matches('.user-badge')) {
+                const dropdowns = document.getElementsByClassName("profile-dropdown");
+                for (let i = 0; i < dropdowns.length; i++) {
+                    let openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+    </script>
 </head>
 <body>
 
@@ -680,7 +1264,7 @@
                         <div class="ticket-item" style="font-size:12px;"><strong>السعر النهائي المعتمد:</strong> <span id="invPrice" style="font-weight:bold; color:var(--porsche-orange);">يحدد لاحقاً من الإدارة</span></div>
                         <div class="ticket-item" id="tickRejectionReason" style="font-size:11px; color:#c62828; margin-top:6px; display:none; background:#ffcdd2; padding:5px; border-radius:3px;"></div>
                         <div class="ticket-item" style="font-size:11px; color:#444; font-weight: bold; margin-top: 8px; text-align: center;" id="liveStatusNote">
-                            * يقوم المسؤول الفني بالمركز الآن بمراجعة طلب الحجز وتأكيده عبر لوحة التحكم الإدارية أدناه.
+                            * يقوم المسؤول الفني بالمركز الآن بمراجعة طلب الحجز وتأكيده من قاعدة البيانات.
                         </div>
                     </div>
                 </div>
@@ -729,7 +1313,7 @@
                         <label>رقم الجوال</label>
                         <input type="tel" id="regPhone" required placeholder="05xxxxxxxx">
                     </div>
-                    <div class="form-group">
+        <div class="form-group">
                         <label>إنشاء كلمة المرور للحساب</label>
                         <input type="password" id="regPassword" required placeholder="أدخل كلمة مرور قوية">
                     </div>
@@ -747,7 +1331,7 @@
         <section class="form-section">
             <div class="form-container admin-container" style="border-top-color: #2e7d32;">
                 <h3>🔐 لوحة التحكم الخاصة بالمسؤولين (الطلبات الواردة)</h3>
-                <p class="work-hours-note">إدارة واعتماد وتحديث طلبات الصيانة بشكل حي ومباشر</p>
+                <p class="work-hours-note">إدارة واعتماد وتحديث طلبات الصيانة بشكل حي ومباشر من سحابة Firebase</p>
                 
                 <div class="table-responsive" style="overflow-x: auto; margin-bottom: 25px;">
                     <table class="table table-bordered align-middle" style="width: 100%; border-collapse: collapse; text-align: right; background: #111; color: white;">
@@ -761,7 +1345,7 @@
                             </tr>
                         </thead>
                         <tbody id="bookingsTableBody">
-                            <!-- سيتم تعبئة الطلبات ديناميكياً هنا فوراً -->
+                            <!-- سيتم تعبئة الطلبات ديناميكياً من Firebase هنا فوراً -->
                         </tbody>
                     </table>
                 </div>
@@ -786,554 +1370,5 @@
             </div>
         </div>
     </footer>
-
-    <script>
-        const porscheImages = [
-            'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=1920&q=80',
-            'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1920&q=80',
-        ];
-        
-        let currentImageIndex = 0;
-        let checkInterval = null;
-
-        window.onload = function() {
-            checkUserSession();
-            startHeroSlider();
-            setupDatePickerMin();
-            handleServiceFieldsChange();
-        };
-
-        function showToast(message) {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerText = message;
-            container.appendChild(toast);
-            setTimeout(() => { toast.remove(); }, 4000);
-        }
-
-        function toggleFaq(element) {
-            element.classList.toggle('active');
-        }
-
-        // دالة فحص كلمة المرور للوحة الإدارة
-        function checkAdminPassword() {
-            const password = prompt("🔐 يرجى إدخال كلمة مرور لوحة الإدارة:");
-            if (password === "ADAM2030") {
-                showToast("تم التحقق بنجاح، جاري فتح لوحة الإدارة...");
-                navigateTo('admin');
-            } else if (password !== null) {
-                showToast("❌ كلمة المرور غير صحيحة!");
-            }
-        }
-
-        function handleServiceFieldsChange() {
-            const selectedService = document.getElementById('bookService').value;
-            const vinGroup = document.getElementById('field-vin-group');
-            const chassisGroup = document.getElementById('field-chassis-group');
-            const kmGroup = document.getElementById('field-km-group');
-            const notesGroup = document.getElementById('field-notes-group');
-
-            const vinInput = document.getElementById('carVin');
-            const chassisInput = document.getElementById('carChassis');
-            const kmInput = document.getElementById('carKm');
-            const notesInput = document.getElementById('carNotes');
-
-            vinInput.removeAttribute('required');
-            chassisInput.removeAttribute('required');
-            kmInput.removeAttribute('required');
-            notesInput.removeAttribute('required');
-            
-            vinGroup.style.display = 'none';
-            chassisGroup.style.display = 'none';
-            kmGroup.style.display = 'none';
-            notesGroup.style.display = 'none';
-
-            if (selectedService === 'تغيير زيت وفلاتر بورش') {
-                vinGroup.style.display = 'block';
-                vinInput.setAttribute('required', 'true');
-            } else if (selectedService === 'فحص ما قبل الشراء') {
-                vinGroup.style.display = 'block';
-                notesGroup.style.display = 'block';
-                vinInput.setAttribute('required', 'true');
-            } else if (selectedService === 'فحص وصيانة ميكانيكية شاملة') {
-                chassisGroup.style.display = 'block';
-                kmGroup.style.display = 'block';
-                chassisInput.setAttribute('required', 'true');
-                kmInput.setAttribute('required', 'true');
-            } else if (selectedService === 'صيانة عامة وإصلاح ميكانيكي') {
-                vinGroup.style.display = 'block';
-                notesGroup.style.display = 'block';
-                vinInput.setAttribute('required', 'true');
-                notesInput.setAttribute('required', 'true');
-            }
-        }
-
-        function setupDatePickerMin() {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('bookDate').setAttribute('min', today);
-        }
-
-        function validateWorkDay(input) {
-            if(!input.value) return;
-            const selectedDate = new Date(input.value);
-            const dayOfWeek = selectedDate.getUTCDay(); 
-            if (dayOfWeek === 5) {
-                showToast("نعتذر منك، يوم الجمعة هو الإجازة الأسبوعية لمركز آدم.");
-                input.value = ""; 
-            }
-        }
-
-        function formatEnglishDate(dateString) {
-            if(!dateString) return "";
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            const dateObj = new Date(dateString);
-            return dateObj.toLocaleDateString('en-US', options);
-        }
-
-        function startHeroSlider() {
-            const heroElement = document.getElementById('hero-slider');
-            if(heroElement) {
-                heroElement.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('${porscheImages[currentImageIndex]}')`;
-                setInterval(() => {
-                    currentImageIndex = (currentImageIndex + 1) % porscheImages.length;
-                    heroElement.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('${porscheImages[currentImageIndex]}')`;
-                }, 7000);
-            }
-        }
-
-        function navigateTo(pageId) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
-            document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
-            
-            const targetPage = document.getElementById(`page-${pageId}`);
-            const targetNav = document.getElementById(`nav-${pageId}`);
-            
-            if(targetPage) targetPage.classList.add('active-page');
-            if(targetNav) targetNav.classList.add('active');
-            
-            if (pageId === 'admin') {
-                loadAdminBookings();
-            }
-
-            document.getElementById('profileDropdownMenu').classList.remove('show');
-            window.scrollTo(0, 0);
-        }
-
-        function quickBook(serviceValue) {
-            navigateTo('booking');
-            document.getElementById('bookService').value = serviceValue;
-            handleServiceFieldsChange();
-        }
-
-        function handleRegister(event) {
-            event.preventDefault();
-            const name = document.getElementById('regName').value;
-            const email = document.getElementById('regEmail').value.toLowerCase();
-            const phone = document.getElementById('regPhone').value;
-            const password = document.getElementById('regPassword').value;
-
-            const userData = { name, email, phone, password, invoices: [] };
-            localStorage.setItem(email, JSON.stringify(userData));
-            localStorage.setItem('activeSessionUser', email);
-
-            showToast('تم إنشاء حسابك بنجاح!');
-            event.target.reset();
-            checkUserSession();
-            navigateTo('booking');
-        }
-
-        function handleLogin(event) {
-            event.preventDefault();
-            const email = document.getElementById('loginEmail').value.toLowerCase();
-            const passwordInput = document.getElementById('loginPassword').value;
-            const localData = localStorage.getItem(email);
-
-            if (localData) {
-                const userData = JSON.parse(localData);
-                if (userData.password === passwordInput) {
-                    localStorage.setItem('activeSessionUser', email);
-                    showToast('تم تسجيل الدخول بنجاح!');
-                    event.target.reset();
-                    checkUserSession();
-                    navigateTo('booking');
-                } else {
-                    showToast('عذراً، كلمة المرور غير صحيحة.');
-                }
-            } else {
-                showToast('عذراً، هذا البريد الإلكتروني غير مسجل.');
-            }
-        }
-
-        function handleNewBooking(event) {
-            event.preventDefault();
-
-            const porscheModel = document.getElementById('porscheModel').value;
-            const service = document.getElementById('bookService').value;
-            const rawDate = document.getElementById('bookDate').value;
-            const time = document.getElementById('bookTime').value;
-
-            const vinVal = document.getElementById('carVin').value.trim();
-            const chassisVal = document.getElementById('carChassis').value.trim();
-            const kmVal = document.getElementById('carKm').value.trim();
-            const notesVal = document.getElementById('carNotes').value.trim();
-
-            if(!time) {
-                showToast("يرجى اختيار وقت مناسب.");
-                return;
-            }
-            
-            const englishFormattedDate = formatEnglishDate(rawDate);
-            let clientName = "";
-            let clientPhone = "";
-            const sessionEmail = localStorage.getItem('activeSessionUser');
-            
-            if (sessionEmail) {
-                const userData = JSON.parse(localStorage.getItem(sessionEmail));
-                clientName = userData.name;
-                clientPhone = userData.phone;
-            } else {
-                clientName = document.getElementById('bookGuestName').value.trim();
-                clientPhone = document.getElementById('bookGuestPhone').value.trim();
-                if(!clientName) {
-                    showToast("يرجى كتابة اسمك الكريم أولاً.");
-                    return;
-                }
-                if(!clientPhone) {
-                    showToast("يرجى كتابة رقم جوالك أولاً.");
-                    return;
-                }
-            }
-            
-            const generatedInvId = Math.floor(100000 + Math.random() * 900000); 
-            const defaultDisplayPrice = "يحدد من الإدارة";
-
-            const newBookingItem = {
-                id: generatedInvId,
-                clientName: clientName,
-                clientPhone: clientPhone,
-                carModel: porscheModel,
-                serviceType: service,
-                date: englishFormattedDate,
-                time: time,
-                status: 'قيد الانتظار',
-                price: defaultDisplayPrice,
-                reason: '',
-                clientEmail: sessionEmail || '' 
-            };
-
-            let globalBookings = JSON.parse(localStorage.getItem('adamAutoBookings')) || [];
-            globalBookings.push(newBookingItem);
-            localStorage.setItem('adamAutoBookings', JSON.stringify(globalBookings));
-
-            if (sessionEmail) {
-                const userData = JSON.parse(localStorage.getItem(sessionEmail));
-                if(!userData.invoices) userData.invoices = [];
-                userData.invoices.push({
-                    id: generatedInvId,
-                    service: service + ` (${porscheModel})`,
-                    date: englishFormattedDate + ' @ ' + time,
-                    price: defaultDisplayPrice,
-                    status: 'قيد الانتظار',
-                    reason: ''
-                });
-                localStorage.setItem(sessionEmail, JSON.stringify(userData));
-                updateInvoiceHistoryDOM(userData.invoices);
-            }
-
-            document.getElementById('tickName').innerText = clientName;
-            document.getElementById('tickPhone').innerText = clientPhone; 
-            document.getElementById('tickModel').innerText = porscheModel;
-            document.getElementById('tickService').innerText = service;
-            document.getElementById('tickDateTime').innerText = `${englishFormattedDate} - ${time}`;
-            document.getElementById('invId').innerText = generatedInvId;
-            document.getElementById('invPrice').innerText = defaultDisplayPrice;
-            document.getElementById('tickRejectionReason').style.display = 'none';
-
-            const tickDynamicSpecs = document.getElementById('tickDynamicSpecs');
-            let specHtml = `🚗 <strong>الطراز:</strong> ${porscheModel}`;
-            if (vinVal) specHtml += `<br>🆔 <strong>VIN:</strong> ${vinVal}`;
-            if (chassisVal) specHtml += `<br>🆔 <strong>الشاصي:</strong> ${chassisVal}`;
-            if (kmVal) specHtml += `<br>📊 <strong>الممشى:</strong> ${kmVal} كم`;
-            if (notesVal) specHtml += `<br>📝 <strong>ملاحظات:</strong> ${notesVal}`;
-            
-            tickDynamicSpecs.innerHTML = specHtml;
-            tickDynamicSpecs.style.display = 'block';
-            
-            const ticketBox = document.getElementById('appointmentTicket');
-            ticketBox.className = "ticket-box status-pending";
-            ticketBox.style.display = "block";
-            
-            document.getElementById('liveStatusBadge').className = "badge-status badge-pending";
-            document.getElementById('liveStatusBadge').innerText = "في انتظار قرار الإدارة...";
-            
-            const mainTitle = document.getElementById('ticketHeaderTitle');
-            mainTitle.innerText = "⏳ حالة الطلب: قيد الانتظار والمراجعة";
-            mainTitle.style.color = "#333"; 
-
-            showToast('تم إرسال طلب الحجز بنجاح وإضافته للوحة تحكم الإدارة!');
-
-            let technicalDetailsText = `\n🏎️ طراز السيارة: ${porscheModel}`;
-            if(vinVal) technicalDetailsText += `\n🆔 رقم الهيكل: ${vinVal}`;
-            if(chassisVal) technicalDetailsText += `\n🆔 رقم الشاصي: ${chassisVal}`;
-            if(kmVal) technicalDetailsText += `\n📊 الممشى: ${kmVal} كم`;
-            if(notesVal) technicalDetailsText += `\n📝 ملاحظات: ${notesVal}`;
-
-            const whatsappMessage = 
-`طلب حجز صيانة بورش جديد قيد المراجعة ⏳
-
-👤 اسم العميل: ${clientName}
-📞 جوال العميل: ${clientPhone}${technicalDetailsText}
-🛠️ الخدمة المطلوبة: ${service}
-📅 تاريخ الموعد: ${englishFormattedDate}
-⏰ وقت الحجز: ${time}
-
-🧾 الفاتورة المبدئية:
-- رقم الفاتورة: #${generatedInvId}
-- السعر: قيد التحديد من الإدارة`;
-
-            const targetPhoneNumber = "966547070334";
-            window.open(`https://api.whatsapp.com/send?phone=${targetPhoneNumber}&text=${encodeURIComponent(whatsappMessage)}`, '_blank');
-
-            if(checkInterval) clearInterval(checkInterval);
-            checkInterval = setInterval(() => {
-                checkLiveStatus(generatedInvId, sessionEmail);
-            }, 4000);
-        }
-
-        function loadAdminBookings() {
-            const tableBody = document.getElementById('bookingsTableBody');
-            if(!tableBody) return;
-            tableBody.innerHTML = '';
-
-            let bookings = JSON.parse(localStorage.getItem('adamAutoBookings')) || [];
-
-            if (bookings.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#aaa;">لا توجد طلبات حجز واردة حالياً</td></tr>';
-                return;
-            }
-
-            bookings.forEach((booking, index) => {
-                let badgeClass = 'badge-pending';
-                let statusText = booking.status || 'قيد الانتظار';
-                if (statusText === 'مقبول') badgeClass = 'badge-accepted';
-                if (statusText === 'مرفوض') badgeClass = 'badge-rejected';
-
-                let reasonDisplay = booking.reason ? `<div style="color:#ff6b6b; font-size:11px; margin-top:4px;">السبب: ${booking.reason}</div>` : '';
-
-                const row = document.createElement('tr');
-                row.style.borderBottom = '1px solid #333';
-                row.innerHTML = `
-                    <td style="padding: 12px; border: 1px solid #444; font-weight:bold;">#${booking.id}</td>
-                    <td style="padding: 12px; border: 1px solid #444;">
-                        <strong>${booking.clientName}</strong><br>
-                        <small style="color: #aaa; direction:ltr; display:inline-block;">📞 ${booking.clientPhone}</small><br>
-                        <small style="color: var(--porsche-orange);">${booking.carModel}</small>
-                    </td>
-                    <td style="padding: 12px; border: 1px solid #444;">
-                        ${booking.serviceType}<br>
-                        <small style="color: #ccc;">📅 ${booking.date} - ${booking.time}</small><br>
-                        <small style="color: #4db6ac;">💰 ${booking.price || 'يحدد لاحقاً'}</small>
-                    </td>
-                    <td style="padding: 12px; border: 1px solid #444;">
-                        <span class="badge-status ${badgeClass}">${statusText}</span>
-                        ${reasonDisplay}
-                    </td>
-                    <td style="padding: 12px; border: 1px solid #444; text-align: center;">
-                        <div style="margin-bottom: 6px;">
-                            <input type="text" id="priceInput_${index}" placeholder="السعر (ر.س)" style="padding:4px; width:90px; background:#222; color:white; border:1px solid #555; font-size:12px; border-radius:3px;" value="${booking.price && booking.price !== 'يحدد من الإدارة' ? booking.price : ''}">
-                        </div>
-                        <div style="margin-bottom: 6px;">
-                            <input type="text" id="reasonInput_${index}" placeholder="سبب الرفض" style="padding:4px; width:130px; background:#222; color:white; border:1px solid #555; font-size:12px; border-radius:3px;" value="${booking.reason || ''}">
-                        </div>
-                        <button class="btn btn-approve" style="padding: 5px 10px; font-size:12px; margin-bottom:4px; width:auto;" onclick="adminUpdateBookingStatus(${index}, 'مقبول')">✅ قبول</button>
-                        <button class="btn btn-reject" style="padding: 5px 10px; font-size:12px; width:auto;" onclick="adminUpdateBookingStatus(${index}, 'مرفوض')">❌ رفض</button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-            });
-        }
-
-        function adminUpdateBookingStatus(index, newStatus) {
-            let bookings = JSON.parse(localStorage.getItem('adamAutoBookings')) || [];
-            if(!bookings[index]) return;
-
-            let priceInputVal = document.getElementById(`priceInput_${index}`).value.trim();
-            let reasonInputVal = document.getElementById(`reasonInput_${index}`).value.trim();
-
-            let finalPrice = "يحدد من الإدارة";
-            if (newStatus === 'مقبول') {
-                if (priceInputVal) {
-                    finalPrice = priceInputVal;
-                } else {
-                    finalPrice = "معتمد بدون سعر محدد";
-                }
-                bookings[index].reason = ""; 
-            }
-
-            if (newStatus === 'مرفوض') {
-                if(!reasonInputVal) {
-                    showToast("⚠️ يرجى كتابة سبب الرفض في الخانة المخصصة.");
-                    return;
-                }
-                bookings[index].reason = reasonInputVal;
-            }
-
-            bookings[index].status = newStatus;
-            bookings[index].price = finalPrice;
-            
-            localStorage.setItem('adamAutoBookings', JSON.stringify(bookings));
-
-            const targetClientEmail = bookings[index].clientEmail;
-            if (targetClientEmail && localStorage.getItem(targetClientEmail)) {
-                let clientUserData = JSON.parse(localStorage.getItem(targetClientEmail));
-                if (clientUserData && clientUserData.invoices) {
-                    clientUserData.invoices = clientUserData.invoices.map(inv => {
-                        if (inv.id == bookings[index].id) {
-                            inv.status = newStatus;
-                            inv.price = finalPrice;
-                            inv.reason = bookings[index].reason;
-                        }
-                        return inv;
-                    });
-                    localStorage.setItem(targetClientEmail, JSON.stringify(clientUserData));
-                    
-                    const activeSession = localStorage.getItem('activeSessionUser');
-                    if (activeSession === targetClientEmail) {
-                        updateInvoiceHistoryDOM(clientUserData.invoices);
-                    }
-                }
-            }
-
-            showToast(`تم تحديث حالة الطلب #${bookings[index].id} إلى (${newStatus}) بنجاح!`);
-            loadAdminBookings();
-        }
-
-        function checkLiveStatus(id, sessionEmail) {
-            let bookings = JSON.parse(localStorage.getItem('adamAutoBookings')) || [];
-            let currentBooking = bookings.find(b => b.id == id);
-            
-            if (!currentBooking) return;
-
-            const ticket = document.getElementById('appointmentTicket');
-            const badge = document.getElementById('liveStatusBadge');
-            const title = document.getElementById('ticketHeaderTitle');
-            const note = document.getElementById('liveStatusNote');
-            const reasonBox = document.getElementById('tickRejectionReason');
-            const priceSpan = document.getElementById('invPrice');
-
-            if (currentBooking.price) {
-                priceSpan.innerText = currentBooking.price;
-            }
-
-            if (currentBooking.status === "مقبول") {
-                ticket.className = "ticket-box status-accepted";
-                title.innerText = "🎉 تم قبول الطلب واعتماده";
-                title.style.color = "#2e7d32"; 
-                badge.className = "badge-status badge-accepted";
-                badge.innerText = "تم قبول الطلب";
-                note.innerText = "تم اعتماد الفاتورة والموعد بنجاح من قِبل إدارة مركز آدم.";
-                reasonBox.style.display = 'none';
-                clearInterval(checkInterval);
-                
-            } else if (currentBooking.status === "مرفوض") {
-                ticket.className = "ticket-box status-rejected";
-                title.innerText = "❌ تم رفض الطلب";
-                title.style.color = "#c62828";
-                badge.className = "badge-status badge-rejected";
-                badge.innerText = "تم رفض الطلب";
-                note.innerText = "عذراً، الموعد أو الخدمة غير متوفرة حالياً.";
-                
-                reasonBox.innerHTML = `<strong>🚫 سبب الرفض:</strong> ${currentBooking.reason || "عذراً، تم إلغاء الموعد من قِبل الإدارة."}`;
-                reasonBox.style.display = 'block';
-                clearInterval(checkInterval);
-            }
-        }
-
-        function updateInvoiceHistoryDOM(invoices) {
-            const container = document.getElementById('invoiceHistoryContainer');
-            if(!container) return;
-            if (!invoices || invoices.length === 0) {
-                container.innerHTML = '<span style="font-size: 11px; color:#777;">لا يوجد فواتير صادرة حالياً.</span>';
-                return;
-            }
-
-            container.innerHTML = '';
-            invoices.forEach(inv => {
-                const item = document.createElement('div');
-                item.className = 'invoice-item';
-                let statusColor = "#ff9800";
-                if(inv.status === "مقبول") statusColor = "#4caf50";
-                if(inv.status === "مرفوض") statusColor = "#f44336";
-
-                let reasonHtml = inv.reason ? `<div style="color:#ff6b6b; margin-top:2px;">السبب: ${inv.reason}</div>` : '';
-
-                item.innerHTML = `
-                    <div><strong>فاتورة #${inv.id}</strong> - ${inv.price} <span style="color:${statusColor}; font-size:10px;">(${inv.status || 'قيد الانتظار'})</span></div>
-                    <div style="color:#aaa;">الخدمة: ${inv.service}</div>
-                    ${reasonHtml}
-                    <div style="color:#888; direction: ltr; text-align: right;">التاريخ: ${inv.date}</div>
-                `;
-                container.prepend(item); 
-            });
-        }
-
-        function checkUserSession() {
-            const sessionEmail = localStorage.getItem('activeSessionUser');
-            const menuLogin = document.getElementById('menu-login');
-            const menuRegister = document.getElementById('menu-register');
-            const profileArea = document.getElementById('userProfileArea');
-            const guestNameGroup = document.getElementById('guestNameGroup');
-            const guestPhoneGroup = document.getElementById('guestPhoneGroup');
-
-            if (sessionEmail) {
-                const userData = JSON.parse(localStorage.getItem(sessionEmail));
-                if(menuLogin) menuLogin.style.display = 'none';
-                if(menuRegister) menuRegister.style.display = 'none';
-                if(guestNameGroup) guestNameGroup.style.display = 'none';
-                if(guestPhoneGroup) guestPhoneGroup.style.display = 'none';
-                
-                if(profileArea) profileArea.style.display = 'block';
-                document.getElementById('userBadgeName').innerText = userData.name;
-                document.getElementById('storedName').innerText = userData.name;
-                document.getElementById('storedEmail').innerText = userData.email;
-                document.getElementById('storedPhone').innerText = userData.phone;
-
-                updateInvoiceHistoryDOM(userData.invoices);
-            } else {
-            if(menuLogin) menuLogin.style.display = 'block';
-                if(menuRegister) menuRegister.style.display = 'block';
-                if(guestNameGroup) guestNameGroup.style.display = 'block';
-                if(guestPhoneGroup) guestPhoneGroup.style.display = 'block';
-                if(profileArea) profileArea.style.display = 'none';
-            }
-        }
-
-        function toggleDropdown(event) {
-            event.stopPropagation();
-            document.getElementById('profileDropdownMenu').classList.toggle('show');
-        }
-
-        function logoutUser() {
-            localStorage.removeItem('activeSessionUser');
-            if(document.getElementById('appointmentTicket')) document.getElementById('appointmentTicket').style.display = "none";
-            if(checkInterval) clearInterval(checkInterval);
-            showToast('تم تسجيل الخروج بنجاح.');
-            checkUserSession();
-            navigateTo('home');
-        }
-
-        window.onclick = function(event) {
-            if (!event.target.matches('.user-badge')) {
-                const dropdowns = document.getElementsByClassName("profile-dropdown");
-                for (let i = 0; i < dropdowns.length; i++) {
-                    let openDropdown = dropdowns[i];
-                    if (openDropdown.classList.contains('show')) {
-                        openDropdown.classList.remove('show');
-                    }
-                }
-            }
-        }
-    </script>
 </body>
 </html>
