@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>آدم أوتو سيرفس | صيانة بورش الاحترافية ونظام الحجوزات الذكي</title>
+    <title>آدم أوتو سيرفس | صيانة بورش الاحترافية ونظام الحجوزات البسيط</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;700&display=swap');
 
@@ -189,11 +189,10 @@
             background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6));
             background-size: cover;
             background-position: center;
-            transition: background-image 1s ease-in-out; 
         }
 
-        .hero h1 { font-size: 42px; margin-bottom: 15px; font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.7); }
-        .hero p { font-size: 17px; max-width: 600px; line-height: 1.6; text-shadow: 0 2px 8px rgba(0,0,0,0.7); }
+        .hero h1 { font-size: 42px; margin-bottom: 15px; font-weight: 700; }
+        .hero p { font-size: 17px; max-width: 600px; line-height: 1.6; }
 
         /* Stats Bar */
         .stats-bar {
@@ -258,9 +257,10 @@
         .service-book-btn:hover { background-color: var(--porsche-orange); }
 
         /* FAQ Section */
-        .faq-container { max-width: 800px; margin: 50px auto; padding: 0 20px; }
+        .faq-container { max-width: 800px; margin: 0 auto; }
         .faq-item { background: white; margin-bottom: 15px; border-radius: 4px; overflow: hidden; border: 1px solid #ddd; }
-        .faq-question { background: var(--porsche-black); color: white; padding: 15px 20px; cursor: pointer; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        .faq-question { background: var(--porsche-black); color: white; padding: 15px 20px; cursor: pointer; font-weight: bold; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
+        .faq-question:hover { color: var(--porsche-orange); }
         .faq-answer { padding: 15px 20px; background: #fff; color: #444; font-size: 14px; line-height: 1.6; display: none; border-top: 1px solid #eee; }
         .faq-item.active .faq-answer { display: block; }
 
@@ -279,8 +279,25 @@
         .form-group input[type="date"] { direction: ltr; text-align: left; }
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--porsche-orange); outline: none; }
 
-        .dynamic-field { display: none; animation: fadeInField 0.4s ease forwards; }
-        @keyframes fadeInField { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        .dynamic-field { display: none; }
+
+        /* Admin Analytics Dashboard Cards */
+        .admin-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .admin-stat-card {
+            background: #181818;
+            border: 1px solid #333;
+            border-top: 3px solid var(--porsche-orange);
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .admin-stat-card h4 { font-size: 24px; color: white; margin-bottom: 5px; }
+        .admin-stat-card p { font-size: 12px; color: #aaa; }
 
         /* Ticket Box */
         .ticket-box {
@@ -291,7 +308,6 @@
             margin-top: 20px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             display: none;
-            transition: all 0.4s ease;
         }
 
         .status-pending { border-right: 6px solid #ff5500; background: #ffffff; }
@@ -301,7 +317,6 @@
         .ticket-box h4 { margin-bottom: 12px; font-size: 17px; border-bottom: 1px solid #ddd; padding-bottom: 6px; color: #333; }
         .ticket-item { margin-bottom: 8px; font-size: 14px; }
         .ticket-item strong { color: #333; }
-        .ticket-datetime-output { direction: ltr; display: inline-block; font-weight: bold; }
 
         .badge-status { padding: 3px 8px; border-radius: 20px; font-weight: bold; font-size: 12px; display: inline-block; }
         .badge-pending { background: #ffe0b2; color: #e65100; }
@@ -324,7 +339,6 @@
         }
         .btn:hover { background-color: #cc4400; }
         
-        .admin-actions { display: flex; gap: 10px; margin-top: 15px; }
         .btn-approve { background-color: #2e7d32; color: white; }
         .btn-reject { background-color: #c62828; color: white; }
 
@@ -378,24 +392,7 @@
         }
     </style>
 
-    <!-- استدعاء حزم Firebase عبر CDN -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        // استبدل البيانات التالية ببيانات مشروعك الفعلية من لوحة تحكم Firebase
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
+    <script>
         const porscheImages = [
             'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=1920&q=80',
             'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1920&q=80',
@@ -425,7 +422,6 @@
             element.classList.toggle('active');
         }
 
-        // دالة فحص كلمة المرور للوحة الإدارة
         window.checkAdminPassword = function() {
             const password = prompt("🔐 يرجى إدخال كلمة مرور لوحة الإدارة:");
             if (password === "ADAM2030") {
@@ -443,38 +439,22 @@
             const kmGroup = document.getElementById('field-km-group');
             const notesGroup = document.getElementById('field-notes-group');
 
-            const vinInput = document.getElementById('carVin');
-            const chassisInput = document.getElementById('carChassis');
-            const kmInput = document.getElementById('carKm');
-            const notesInput = document.getElementById('carNotes');
-
-            vinInput.removeAttribute('required');
-            chassisInput.removeAttribute('required');
-            kmInput.removeAttribute('required');
-            notesInput.removeAttribute('required');
-            
             vinGroup.style.display = 'none';
             chassisGroup.style.display = 'none';
             kmGroup.style.display = 'none';
             notesGroup.style.display = 'none';
 
-            if (selectedService === 'تغيير زيت وفلاتر بورش') {
+            if (selectedService.includes('زيت')) {
                 vinGroup.style.display = 'block';
-                vinInput.setAttribute('required', 'true');
-            } else if (selectedService === 'فحص ما قبل الشراء') {
+            } else if (selectedService.includes('الشراء')) {
                 vinGroup.style.display = 'block';
                 notesGroup.style.display = 'block';
-                vinInput.setAttribute('required', 'true');
-            } else if (selectedService === 'فحص وصيانة ميكانيكية شاملة') {
+            } else if (selectedService.includes('شاملة')) {
                 chassisGroup.style.display = 'block';
                 kmGroup.style.display = 'block';
-                chassisInput.setAttribute('required', 'true');
-                kmInput.setAttribute('required', 'true');
-            } else if (selectedService === 'صيانة عامة وإصلاح ميكانيكي') {
+            } else if (selectedService.includes('عامة')) {
                 vinGroup.style.display = 'block';
                 notesGroup.style.display = 'block';
-                vinInput.setAttribute('required', 'true');
-                notesInput.setAttribute('required', 'true');
             }
         }
 
@@ -487,9 +467,8 @@
         window.validateWorkDay = function(input) {
             if(!input.value) return;
             const selectedDate = new Date(input.value);
-            const dayOfWeek = selectedDate.getUTCDay(); 
-            if (dayOfWeek === 5) {
-                showToast("نعتذر منك، يوم الجمعة هو الإجازة الأسبوعية لمركز آدم.");
+            if (selectedDate.getUTCDay() === 5) {
+                showToast("نعتذر منك، يوم الجمعة إجازة أسبوعية لمركز آدم.");
                 input.value = ""; 
             }
         }
@@ -497,8 +476,7 @@
         function formatEnglishDate(dateString) {
             if(!dateString) return "";
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            const dateObj = new Date(dateString);
-            return dateObj.toLocaleDateString('en-US', options);
+            return new Date(dateString).toLocaleDateString('en-US', options);
         }
 
         function startHeroSlider() {
@@ -576,8 +554,7 @@
             }
         }
 
-        // إرسال الحجز وربطه بـ Firebase Firestore
-        window.handleNewBooking = async function(event) {
+        window.handleNewBooking = function(event) {
             event.preventDefault();
 
             const porscheModel = document.getElementById('porscheModel').value;
@@ -607,18 +584,13 @@
             } else {
                 clientName = document.getElementById('bookGuestName').value.trim();
                 clientPhone = document.getElementById('bookGuestPhone').value.trim();
-                if(!clientName) {
-                    showToast("يرجى كتابة اسمك الكريم أولاً.");
-                    return;
-                }
-                if(!clientPhone) {
-                    showToast("يرجى كتابة رقم جوالك أولاً.");
+                if(!clientName || !clientPhone) {
+                    showToast("يرجى كتابة الاسم ورقم الجوال أولاً.");
                     return;
                 }
             }
             
             const generatedInvId = Math.floor(100000 + Math.random() * 900000); 
-            const defaultDisplayPrice = "يحدد من الإدارة";
 
             const newBookingItem = {
                 id: generatedInvId,
@@ -629,20 +601,15 @@
                 date: englishFormattedDate,
                 time: time,
                 status: 'قيد الانتظار',
-                price: defaultDisplayPrice,
+                price: 'يحدد من الإدارة',
                 reason: '',
                 clientEmail: sessionEmail || '',
                 createdAt: Date.now()
             };
 
-            try {
-                // حفظ البيانات في قاعدة بيانات Firebase Firestore
-                await addDoc(collection(db, "bookings"), newBookingItem);
-            } catch (error) {
-                console.error("خطأ في حفظ الحجز بقاعدة البيانات:", error);
-                showToast("حدث خطأ أثناء الاتصال بقاعدة البيانات.");
-                return;
-            }
+            let allGlobalBookings = JSON.parse(localStorage.getItem('adam_global_bookings') || '[]');
+            allGlobalBookings.unshift(newBookingItem);
+            localStorage.setItem('adam_global_bookings', JSON.stringify(allGlobalBookings));
 
             if (sessionEmail) {
                 const userData = JSON.parse(localStorage.getItem(sessionEmail));
@@ -651,7 +618,7 @@
                     id: generatedInvId,
                     service: service + ` (${porscheModel})`,
                     date: englishFormattedDate + ' @ ' + time,
-                    price: defaultDisplayPrice,
+                    price: 'يحدد من الإدارة',
                     status: 'قيد الانتظار',
                     reason: ''
                 });
@@ -665,8 +632,7 @@
             document.getElementById('tickService').innerText = service;
             document.getElementById('tickDateTime').innerText = `${englishFormattedDate} - ${time}`;
             document.getElementById('invId').innerText = generatedInvId;
-            document.getElementById('invPrice').innerText = defaultDisplayPrice;
-            document.getElementById('tickRejectionReason').style.display = 'none';
+            document.getElementById('invPrice').innerText = 'يحدد من الإدارة';
 
             const tickDynamicSpecs = document.getElementById('tickDynamicSpecs');
             let specHtml = `🚗 <strong>الطراز:</strong> ${porscheModel}`;
@@ -689,7 +655,7 @@
             mainTitle.innerText = "⏳ حالة الطلب: قيد الانتظار والمراجعة";
             mainTitle.style.color = "#333"; 
 
-            showToast('تم إرسال طلب الحجز بنجاح وإضافته للوحة تحكم الإدارة!');
+            showToast('تم إرسال طلب الحجز بنجاح وإشعار الإدارة فورياً!');
 
             let technicalDetailsText = `\n🏎️ طراز السيارة: ${porscheModel}`;
             if(vinVal) technicalDetailsText += `\n🆔 رقم الهيكل: ${vinVal}`;
@@ -698,7 +664,7 @@
             if(notesVal) technicalDetailsText += `\n📝 ملاحظات: ${notesVal}`;
 
             const whatsappMessage = 
-`طلب حجز صيانة بورش جديد قيد المراجعة ⏳
+`🔔 تنبيه طلب حجز صيانة بورش جديد (إشعار فوري للمشرف):
 
 👤 اسم العميل: ${clientName}
 📞 جوال العميل: ${clientPhone}${technicalDetailsText}
@@ -706,171 +672,159 @@
 📅 تاريخ الموعد: ${englishFormattedDate}
 ⏰ وقت الحجز: ${time}
 
-🧾 الفاتورة المبدئية:
-- رقم الفاتورة: #${generatedInvId}
+🧾 رقم الحجز: #${generatedInvId}
 - السعر: قيد التحديد من الإدارة`;
 
-            const targetPhoneNumber = "966547070334";
-            window.open(`https://api.whatsapp.com/send?phone=${targetPhoneNumber}&text=${encodeURIComponent(whatsappMessage)}`, '_blank');
+            window.open(`https://api.whatsapp.com/send?phone=966547070334&text=${encodeURIComponent(whatsappMessage)}`, '_blank');
 
             if(checkInterval) clearInterval(checkInterval);
             checkInterval = setInterval(() => {
                 checkLiveStatus(generatedInvId);
-            }, 4000);
+            }, 3000);
         }
 
-        // جلب الحجوزات لعرضها في لوحة تحكم المسؤول من Firebase
-        window.loadAdminBookings = async function() {
+        window.loadAdminBookings = function() {
             const tableBody = document.getElementById('bookingsTableBody');
             if(!tableBody) return;
-            tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#aaa;">جاري جلب الطلبات من قاعدة البيانات...</td></tr>';
 
-            try {
-                const querySnapshot = await getDocs(collection(db, "bookings"));
-                tableBody.innerHTML = '';
+            let allGlobalBookings = JSON.parse(localStorage.getItem('adam_global_bookings') || '[]');
+            tableBody.innerHTML = '';
 
-                if (querySnapshot.empty) {
-                    tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#aaa;">لا توجد طلبات حجز واردة حالياً</td></tr>';
-                    return;
-                }
+            let totalCount = allGlobalBookings.length;
+            let acceptedCount = allGlobalBookings.filter(b => b.status === 'مقبول').length;
+            let pendingCount = allGlobalBookings.filter(b => b.status === 'قيد الانتظار').length;
+            let rejectedCount = allGlobalBookings.filter(b => b.status === 'مرفوض').length;
 
-                let index = 0;
-                querySnapshot.forEach((docSnap) => {
-                    const booking = docSnap.data();
-                    const docId = docSnap.id;
+            document.getElementById('statTotal').innerText = totalCount;
+            document.getElementById('statAccepted').innerText = acceptedCount;
+            document.getElementById('statPending').innerText = pendingCount;
+            document.getElementById('statRejected').innerText = rejectedCount;
 
-                    let badgeClass = 'badge-pending';
-                    let statusText = booking.status || 'قيد الانتظار';
-                    if (statusText === 'مقبول') badgeClass = 'badge-accepted';
-                    if (statusText === 'مرفوض') badgeClass = 'badge-rejected';
-
-                    let reasonDisplay = booking.reason ? `<div style="color:#ff6b6b; font-size:11px; margin-top:4px;">السبب: ${booking.reason}</div>` : '';
-
-                    const row = document.createElement('tr');
-                    row.style.borderBottom = '1px solid #333';
-                    row.innerHTML = `
-                        <td style="padding: 12px; border: 1px solid #444; font-weight:bold;">#${booking.id}</td>
-                        <td style="padding: 12px; border: 1px solid #444;">
-                            <strong>${booking.clientName}</strong><br>
-                            <small style="color: #aaa; direction:ltr; display:inline-block;">📞 ${booking.clientPhone}</small><br>
-                            <small style="color: var(--porsche-orange);">${booking.carModel}</small>
-                        </td>
-                        <td style="padding: 12px; border: 1px solid #444;">
-                            ${booking.serviceType}<br>
-                            <small style="color: #ccc;">📅 ${booking.date} - ${booking.time}</small><br>
-                            <small style="color: #4db6ac;">💰 ${booking.price || 'يحدد لاحقاً'}</small>
-                        </td>
-                        <td style="padding: 12px; border: 1px solid #444;">
-                            <span class="badge-status ${badgeClass}">${statusText}</span>
-                            ${reasonDisplay}
-                        </td>
-                        <td style="padding: 12px; border: 1px solid #444; text-align: center;">
-                            <div style="margin-bottom: 6px;">
-                                <input type="text" id="priceInput_${index}" placeholder="السعر (ر.س)" style="padding:4px; width:90px; background:#222; color:white; border:1px solid #555; font-size:12px; border-radius:3px;" value="${booking.price && booking.price !== 'يحدد من الإدارة' ? booking.price : ''}">
-                            </div>
-                            <div style="margin-bottom: 6px;">
-                                <input type="text" id="reasonInput_${index}" placeholder="سبب الرفض" style="padding:4px; width:130px; background:#222; color:white; border:1px solid #555; font-size:12px; border-radius:3px;" value="${booking.reason || ''}">
-                            </div>
-                            <button class="btn btn-approve" style="padding: 5px 10px; font-size:12px; margin-bottom:4px; width:auto;" onclick="adminUpdateBookingStatus('${docId}', ${index}, 'مقبول')">✅ قبول</button>
-                            <button class="btn btn-reject" style="padding: 5px 10px; font-size:12px; width:auto;" onclick="adminUpdateBookingStatus('${docId}', ${index}, 'مرفوض')">❌ رفض</button>
-                        </td>
-                    `;
-                    tableBody.appendChild(row);
-                    index++;
-                });
-            } catch (error) {
-                console.error("خطأ في جلب البيانات:", error);
-                tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#ff5500;">حدث خطأ أثناء تحميل الطلبات من Firebase.</td></tr>';
+            if (totalCount === 0) {
+                tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#aaa;">لا توجد طلبات حجز واردة حالياً</td></tr>';
+                return;
             }
+
+            allGlobalBookings.forEach((booking, index) => {
+                let badgeClass = 'badge-pending';
+                let statusText = booking.status || 'قيد الانتظار';
+                if (statusText === 'مقبول') badgeClass = 'badge-accepted';
+                if (statusText === 'مرفوض') badgeClass = 'badge-rejected';
+
+                let reasonDisplay = booking.reason ? `<div style="color:#ff6b6b; font-size:11px; margin-top:4px;">السبب: ${booking.reason}</div>` : '';
+
+                const row = document.createElement('tr');
+                row.style.borderBottom = '1px solid #333';
+                row.innerHTML = `
+                    <td style="padding: 12px; border: 1px solid #444; font-weight:bold;">#${booking.id}</td>
+                    <td style="padding: 12px; border: 1px solid #444;">
+                        <strong>${booking.clientName}</strong><br>
+                        <small style="color: #aaa; direction:ltr; display:inline-block;">📞 ${booking.clientPhone}</small><br>
+                        <small style="color: var(--porsche-orange);">${booking.carModel}</small>
+                    </td>
+                    <td style="padding: 12px; border: 1px solid #444;">
+                        ${booking.serviceType}<br>
+                        <small style="color: #ccc;">📅 ${booking.date} - ${booking.time}</small><br>
+                        <small style="color: #4db6ac;">💰 ${booking.price || 'يحدد لاحقاً'}</small>
+                    </td>
+                    <td style="padding: 12px; border: 1px solid #444;">
+                        <span class="badge-status ${badgeClass}">${statusText}</span>
+                        ${reasonDisplay}
+                    </td>
+                    <td style="padding: 12px; border: 1px solid #444; text-align: center;">
+                        <div style="margin-bottom: 6px;">
+                            <input type="text" id="priceInput_${index}" placeholder="السعر (ر.س)" style="padding:4px; width:90px; background:#222; color:white; border:1px solid #555; font-size:12px; border-radius:3px;" value="${booking.price !== 'يحدد من الإدارة' ? booking.price : ''}">
+                        </div>
+                        <div style="margin-bottom: 6px;">
+                            <input type="text" id="reasonInput_${index}" placeholder="سبب الرفض" style="padding:4px; width:130px; background:#222; color:white; border:1px solid #555; font-size:12px; border-radius:3px;" value="${booking.reason || ''}">
+                        </div>
+                        <button class="btn btn-approve" style="padding: 5px 10px; font-size:12px; margin-bottom:4px; width:auto;" onclick="adminUpdateBookingStatus(${booking.id}, ${index}, 'مقبول')">✅ قبول</button>
+                        <button class="btn btn-reject" style="padding: 5px 10px; font-size:12px; width:auto;" onclick="adminUpdateBookingStatus(${booking.id}, ${index}, 'مرفوض')">❌ رفض</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
         }
 
-        // تحديث حالة الطلب في قاعدة بيانات Firebase
-        window.adminUpdateBookingStatus = async function(docId, index, newStatus) {
+        window.adminUpdateBookingStatus = function(bookingId, index, newStatus) {
             let priceInputVal = document.getElementById(`priceInput_${index}`).value.trim();
             let reasonInputVal = document.getElementById(`reasonInput_${index}`).value.trim();
 
-            let finalPrice = "يحدد من الإدارة";
-            let finalReason = "";
+            let finalPrice = newStatus === 'مقبول' ? (priceInputVal || "معتمد") : "يحدد من الإدارة";
+            let finalReason = newStatus === 'مرفوض' ? (reasonInputVal || "تم إلغاء الموعد") : "";
 
-            if (newStatus === 'مقبول') {
-                if (priceInputVal) {
-                    finalPrice = priceInputVal;
-                } else {
-                    finalPrice = "معتمد بدون سعر محدد";
+            let allGlobalBookings = JSON.parse(localStorage.getItem('adam_global_bookings') || '[]');
+            
+            let targetClientEmail = "";
+            allGlobalBookings = allGlobalBookings.map(b => {
+                if(b.id === bookingId) {
+                    b.status = newStatus;
+                    b.price = finalPrice;
+                    b.reason = finalReason;
+                    targetClientEmail = b.clientEmail;
+                }
+                return b;
+            });
+
+            localStorage.setItem('adam_global_bookings', JSON.stringify(allGlobalBookings));
+
+            // تحديث سجل الفواتير وحجوزات العميل المسجل تلقائياً إذا كان مسجلاً بالبريد الإلكتروني
+            if (targetClientEmail && localStorage.getItem(targetClientEmail)) {
+                let clientUserData = JSON.parse(localStorage.getItem(targetClientEmail));
+                if (clientUserData.invoices) {
+                    clientUserData.invoices = clientUserData.invoices.map(inv => {
+                        if (inv.id === bookingId) {
+                            inv.status = newStatus;
+                            inv.price = finalPrice;
+                            inv.reason = finalReason;
+                        }
+                        return inv;
+                    });
+                    localStorage.setItem(targetClientEmail, JSON.stringify(clientUserData));
+                    
+                    // تحديث العرض البصري مباشرة إذا كان العميل الحالي هو نفسه صاحب الحساب
+                    const currentSession = localStorage.getItem('activeSessionUser');
+                    if (currentSession === targetClientEmail) {
+                        updateInvoiceHistoryDOM(clientUserData.invoices);
+                    }
                 }
             }
 
-            if (newStatus === 'مرفوض') {
-                if(!reasonInputVal) {
-                    showToast("⚠️ يرجى كتابة سبب الرفض في الخانة المخصصة.");
-                    return;
-                }
-                finalReason = reasonInputVal;
-            }
-
-            try {
-                const docRef = doc(db, "bookings", docId);
-                await updateDoc(docRef, { 
-                    status: newStatus,
-                    price: finalPrice,
-                    reason: finalReason
-                });
-
-                showToast(`تم تحديث الحالة إلى (${newStatus}) بنجاح!`);
-                loadAdminBookings();
-            } catch (error) {
-                console.error("خطأ في تحديث الحالة:", error);
-                showToast("تعذر تحديث الحالة في قاعدة البيانات.");
-            }
+            showToast(`تم تحديث الحالة إلى (${newStatus}) بنجاح!`);
+            loadAdminBookings();
         }
 
-        // تتبع حالة الطلب للعميل عبر Firebase
-        async function checkLiveStatus(targetInvId) {
-            try {
-                const q = query(collection(db, "bookings"), where("id", "==", targetInvId));
-                const querySnapshot = await getDocs(q);
-                
-                if (querySnapshot.empty) return;
+        function checkLiveStatus(targetInvId) {
+            let allGlobalBookings = JSON.parse(localStorage.getItem('adam_global_bookings') || '[]');
+            const currentBooking = allGlobalBookings.find(b => b.id === targetInvId);
+            if (!currentBooking) return;
 
-                querySnapshot.forEach((docSnap) => {
-                    const currentBooking = docSnap.data();
+            const ticket = document.getElementById('appointmentTicket');
+            const badge = document.getElementById('liveStatusBadge');
+            const title = document.getElementById('ticketHeaderTitle');
+            const note = document.getElementById('liveStatusNote');
+            const priceSpan = document.getElementById('invPrice');
 
-                    const ticket = document.getElementById('appointmentTicket');
-                    const badge = document.getElementById('liveStatusBadge');
-                    const title = document.getElementById('ticketHeaderTitle');
-                    const note = document.getElementById('liveStatusNote');
-                    const reasonBox = document.getElementById('tickRejectionReason');
-                    const priceSpan = document.getElementById('invPrice');
+            if (currentBooking.price) {
+                priceSpan.innerText = currentBooking.price;
+            }
 
-                    if (currentBooking.price) {
-                        priceSpan.innerText = currentBooking.price;
-                    }
-
-                    if (currentBooking.status === "مقبول") {
-                        ticket.className = "ticket-box status-accepted";
-                        title.innerText = "🎉 تم قبول الطلب واعتماده";
-                        title.style.color = "#2e7d32"; 
-                        badge.className = "badge-status badge-accepted";
-                        badge.innerText = "تم قبول الطلب";
-                        note.innerText = "تم اعتماد الفاتورة والموعد بنجاح من قِبل إدارة مركز آدم.";
-                        reasonBox.style.display = 'none';
-                        clearInterval(checkInterval);
-                        
-                    } else if (currentBooking.status === "مرفوض") {
-                        ticket.className = "ticket-box status-rejected";
-                        title.innerText = "❌ تم رفض الطلب";
-                        title.style.color = "#c62828";
-                        badge.className = "badge-status badge-rejected";
-                        badge.innerText = "تم رفض الطلب";
-                        note.innerText = "عذراً، الموعد أو الخدمة غير متوفرة حالياً.";
-                        
-                        reasonBox.innerHTML = `<strong>🚫 سبب الرفض:</strong> ${currentBooking.reason || "عذراً، تم إلغاء الموعد من قِبل الإدارة."}`;
-                        reasonBox.style.display = 'block';
-                        clearInterval(checkInterval);
-                    }
-                });
-            } catch (e) {
-                console.error("خطأ في تتبع الحالة:", e);
+            if (currentBooking.status === "مقبول") {
+                ticket.className = "ticket-box status-accepted";
+                title.innerText = "🎉 تم قبول الطلب واعتماده";
+                title.style.color = "#2e7d32"; 
+                badge.className = "badge-status badge-accepted";
+                badge.innerText = "تم قبول الطلب";
+                if(note) note.innerText = "تم اعتماد الموعد بنجاح.";
+                clearInterval(checkInterval);
+            } else if (currentBooking.status === "مرفوض") {
+                ticket.className = "ticket-box status-rejected";
+                title.innerText = "❌ تم رفض الطلب";
+                title.style.color = "#c62828";
+                badge.className = "badge-status badge-rejected";
+                badge.innerText = "تم رفض الطلب";
+                if(note) note.innerText = currentBooking.reason || "عذراً، تم إلغاء الموعد.";
+                clearInterval(checkInterval);
             }
         }
 
@@ -878,7 +832,7 @@
             const container = document.getElementById('invoiceHistoryContainer');
             if(!container) return;
             if (!invoices || invoices.length === 0) {
-                container.innerHTML = '<span style="font-size: 11px; color:#777;">لا يوجد فواتير صادرة حالياً.</span>';
+                container.innerHTML = '<span style="font-size: 11px; color:#777;">لا يوجد حجوزات سابقة.</span>';
                 return;
             }
 
@@ -887,16 +841,17 @@
                 const item = document.createElement('div');
                 item.className = 'invoice-item';
                 let statusColor = "#ff9800";
-                if(inv.status === "مقبول") statusColor = "#4caf50";
-                if(inv.status === "مرفوض") statusColor = "#f44336";
+                let statusText = inv.status || 'قيد الانتظار';
+                if(statusText === "مقبول") statusColor = "#4caf50";
+                if(statusText === "مرفوض") statusColor = "#f44336";
 
-                let reasonHtml = inv.reason ? `<div style="color:#ff6b6b; margin-top:2px;">السبب: ${inv.reason}</div>` : '';
+                let reasonSub = inv.reason ? `<div style="color:#ff6b6b;">السبب: ${inv.reason}</div>` : '';
 
                 item.innerHTML = `
-                    <div><strong>فاتورة #${inv.id}</strong> - ${inv.price} <span style="color:${statusColor}; font-size:10px;">(${inv.status || 'قيد الانتظار'})</span></div>
+                    <div><strong>رقم الحجز #${inv.id}</strong> - ${inv.price} <span style="color:${statusColor}; font-size:10px; font-weight:bold;">(${statusText})</span></div>
                     <div style="color:#aaa;">الخدمة: ${inv.service}</div>
-                    ${reasonHtml}
                     <div style="color:#888; direction: ltr; text-align: right;">التاريخ: ${inv.date}</div>
+                    ${reasonSub}
                 `;
                 container.prepend(item); 
             });
@@ -996,9 +951,9 @@
                         <p><strong>جوال العميل: </strong><span id="storedPhone"></span></p>
                         
                         <div class="history-section">
-                            <h6>🧾 سجل الصيانة والفواتير الصادرة:</h6>
+                            <h6>🧾 سجل الصيانة وحجوزاتك:</h6>
                             <div id="invoiceHistoryContainer">
-                                <span style="font-size: 11px; color:#777;">لا يوجد فواتير صادرة حالياً.</span>
+                                <span style="font-size: 11px; color:#777;">لا يوجد حجوزات سابقة.</span>
                             </div>
                         </div>
 
@@ -1009,7 +964,7 @@
         </div>
     </header>
 
-    <!-- 1. الرئيسية مع عداد الإنجازات -->
+    <!-- 1. الرئيسية -->
     <div id="page-home" class="page active-page">
         <section class="hero" id="hero-slider">
             <h1>آدم أوتو سيرفس</h1>
@@ -1017,25 +972,12 @@
             <button class="btn" style="width: auto;" onclick="navigateTo('booking')">احجز موعد صيانة الآن</button>
         </section>
 
-        <!-- عداد الإنجازات -->
         <div class="stats-bar">
             <div class="stats-grid">
-                <div class="stat-box">
-                    <h3>+850</h3>
-                    <p>سيارة بورش تم صيانتها وبرمجتها</p>
-                </div>
-                <div class="stat-box">
-                    <h3>100%</h3>
-                    <p>قطع أصلية ومعايير مصنعية</p>
-                </div>
-                <div class="stat-box">
-                    <h3>+12</h3>
-                    <p>عاماً من الخبرة التخصصية الفائقة</p>
-                </div>
-                <div class="stat-box">
-                    <h3>24/7</h3>
-                    <p>دعم طوارئ وسحب سريع بالخبر</p>
-                </div>
+                <div class="stat-box"><h3>+850</h3><p>سيارة بورش تم صيانتها وبرمجتها</p></div>
+                <div class="stat-box"><h3>100%</h3><p>قطع أصلية ومعايير مصنعية</p></div>
+                <div class="stat-box"><h3>+12</h3><p>عاماً من الخبرة التخصصية الفائقة</p></div>
+                <div class="stat-box"><h3>24/7</h3><p>دعم طوارئ وسحب سريع بالخبر</p></div>
             </div>
         </div>
     </div>
@@ -1051,15 +993,15 @@
                 <div class="about-box">
                     <h3>⚙️ معلومات عن الورشة</h3>
                     <p style="color: #444; line-height: 1.8; font-size: 15px;">
-                        يعتبر مركز <strong>آدم أوتو سيرفس</strong> صرحاً متكاملاً مخصصاً لصيانة وبرمجة وفحص سيارات بورش بكافة طرازاتها وفئاتها بالخبر. نوفر لعملائنا رعاية فائقة تتوافق مع المعايير والمواصفات القياسية المصنعية للسيارات الرياضية الفاخرة.
+                        يعتبر مركز <strong>آدم أوتو سيرفس</strong> صرحاً متكاملاً مخصصاً لصيانة وبرمجة وفحص سيارات بورش بكافة طرازاتها وفئاتها بالخبر. نوفر لعملائنا رعاية فائقة تتوافق مع المعايير والمواصفات القياسية.
                     </p>
                 </div>
                 <div class="about-box">
                     <h3>💎 مميزات آدم أوتو سيرفس</h3>
                     <ul>
-                        <li><strong>أيام العمل السنوية:</strong> نعمل من السبت إلى الخميس (الجمعة إجازة).</li>
-                        <li><strong>ساعات العمل اليومية:</strong> من الساعة 8:00 صباحاً حتى الساعة 8:00 مساءً متواصلة.</li>
-                        <li><strong>أحدث التقنيات:</strong> أجهزة فحص ألمانية متطورة مخصصة لقراءة وبرمجة أنظمة بورش المعقدة.</li>
+                        <li><strong>أيام العمل:</strong> من السبت إلى الخميس (الجمعة إجازة).</li>
+                        <li><strong>ساعات العمل:</strong> من الساعة 8:00 صباحاً حتى الساعة 8:00 مساءً.</li>
+                        <li><strong>أحدث التقنيات:</strong> أجهزة فحص ألمانية متطورة مخصصة لبرمجة بورش.</li>
                     </ul>
                 </div>
             </div>
@@ -1075,80 +1017,72 @@
             <h2 class="section-title">خدماتنا المتميزة لسيارات بورش</h2>
             <div class="services-grid">
                 <div class="service-card">
-                    <div>
-                        <div class="service-icon">🛢️</div>
-                        <h3>تغيير الزيت</h3>
-                        <p>نستخدم أفضل الزيوت المعتمدة والموصى بها من المصنع لضمان سلاسة وحماية المحرك.</p>
-                    </div>
+                    <div><div class="service-icon">🛢️</div><h3>تغيير الزيت</h3><p>نستخدم أفضل الزيوت المعتمدة والموصى بها من المصنع لضمان سلاسة المحرك.</p></div>
                     <button class="service-book-btn" onclick="quickBook('تغيير زيت وفلاتر بورش')">حجز موعد</button>
                 </div>
                 <div class="service-card">
-                    <div>
-                        <div class="service-icon">🔍</div>
-                        <h3>فحص ما قبل الشراء</h3>
-                        <p>فحص شامل دقيق ومفصل لمحرك وبدي وأنظمة سيارة بورش قبل إتمام شرائها لتكون في اطمئنان تام.</p>
-                    </div>
+                    <div><div class="service-icon">🔍</div><h3>فحص ما قبل الشراء</h3><p>فحص شامل دقيق ومفصل لمحرك وبدي وأنظمة سيارة بورش قبل إتمام شرائها.</p></div>
                     <button class="service-book-btn" onclick="quickBook('فحص ما قبل الشراء')">حجز موعد</button>
                 </div>
                 <div class="service-card">
-                    <div>
-                        <div class="service-icon">🔧</div>
-                        <h3>الصيانة الدورية</h3>
-                        <p>فحص ميكانيكي الكهربائي دقيق وشامل لجميع أجزاء السيارة بأحدث الأجهزة المخصصة.</p>
-                    </div>
+                    <div><div class="service-icon">🔧</div><h3>الصيانة الدورية</h3><p>فحص ميكانيكي الكهربائي دقيق وشامل لجميع أجزاء السيارة.</p></div>
                     <button class="service-book-btn" onclick="quickBook('فحص وصيانة ميكانيكية شاملة')">حجز موعد</button>
                 </div>
                 <div class="service-card">
-                    <div>
-                        <div class="service-icon">🧰</div>
-                        <h3>صيانة عامة</h3>
-                        <p>إصلاح الأنظمة الميكانيكية والمعقدة، والتربيط، ومعالجة كافة المشاكل والعيوب المصنعية باحترافية.</p>
-                    </div>
+                    <div><div class="service-icon">🧰</div><h3>صيانة عامة</h3><p>إصلاح الأنظمة الميكانيكية والمعقدة ومعالجة كافة المشاكل والعيوب.</p></div>
                     <button class="service-book-btn" onclick="quickBook('صيانة عامة وإصلاح ميكانيكي')">حجز موعد</button>
                 </div>
                 <div class="service-card">
-                    <div>
-                        <div class="service-icon">💻</div>
-                        <h3>برمجة وفحص كمبيوتر</h3>
-                        <p>تحديث الأنظمة، قراءة الأعطال بدقة، وبرمجة كاملة لجميع كمبيوترات سيارات بورش.</p>
-                    </div>
+                    <div><div class="service-icon">💻</div><h3>برمجة وفحص كمبيوتر</h3><p>تحديث الأنظمة، قراءة الأعطال بدقة، وبرمجة كاملة لجميع كمبيوترات بورش.</p></div>
                     <button class="service-book-btn" onclick="quickBook('برمجة وفحص كمبيوتر متطور')">حجز موعد</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 4. الأسئلة الشائعة FAQ -->
+    <!-- 4. الأسئلة الشائعة -->
     <div id="page-faq" class="page">
         <div class="services-container">
-            <h2 class="section-title">الأسئلة الشائعة</h2>
+            <h2 class="section-title">الأسئلة الشائعة والاستفسارات</h2>
             <div class="faq-container">
                 <div class="faq-item" onclick="toggleFaq(this)">
-                    <div class="faq-question"><span>هل تستخدمون قطع غيار أصلية ومعتمدة لسيارات بورش؟</span> <span>▼</span></div>
-                    <div class="faq-answer">نعم، نعتمد على قطع الغيار الأصلية والمطابقة تماماً للمواصفات المصنعية لضمان أداء رياضي آمن ومستدام لسيارتك.</div>
+                    <div class="faq-question"><span>هل تستخدمون قطع غيار أصلية ومعتمدة لبورش؟</span> <span>▼</span></div>
+                    <div class="faq-answer">نعم، نعتمد على قطع الغيار الأصلية والمطابقة تماماً للمواصفات المصنعية لضمان كفاءة وأداء سيارتك الرياضية أو الفاخرة.</div>
                 </div>
                 <div class="faq-item" onclick="toggleFaq(this)">
                     <div class="faq-question"><span>كم تستغرق عملية فحص الكمبيوتر وبرمجة السيارة؟</span> <span>▼</span></div>
-                    <div class="faq-answer">تستغرق عملية الفحص الشامل وبرمجة الأنظمة عادة ما بين 45 دقيقة إلى ساعتين كحد أقصى بحسب موديل السيارة ونوع الخدمة المطلوبة.</div>
+                    <div class="faq-answer">تستغرق عملية الفحص الشامل وقراءة الأعطال بالكمبيوتر عادة ما بين 45 دقيقة إلى ساعتين كحد أقصى حسب موديل السيارة وحجم الفحص المطلوب.</div>
                 </div>
                 <div class="faq-item" onclick="toggleFaq(this)">
-                    <div class="faq-question"><span>هل توفرون ضماناً على أعمال الصيانة والإصلاح؟</span> <span>▼</span></div>
-                    <div class="faq-answer">نعم، نقدم ضماناً معتمداً على كافة أعمال الإصلاح الميكانيكي وقطع الغيار والبرمجة المقدمة في مركز آدم أوتو سيرفس.</div>
+                    <div class="faq-question"><span>هل يتوفر لديكم خدمة سحب السيارات (سطحة) في حالات الأعطال الطارئة؟</span> <span>▼</span></div>
+                    <div class="faq-answer">نعم، نوفر خدمة سحب سريعة ومجهزة خصيصاً للسيارات الرياضية الفاخرة (منخفضة الارتفاع) على مدار الساعة في مدينة الخبر، ويمكنك طلبها مباشرة عبر زر الطوارئ العائم بالشاشة.</div>
                 </div>
                 <div class="faq-item" onclick="toggleFaq(this)">
-                    <div class="faq-question"><span>كيف يمكنني طلب خدمة السطحة الطارئة؟</span> <span>▼</span></div>
-                    <div class="faq-answer">يمكنك الضغط على زر "طلب سحب طارئ (سطحة)" العائم أسفل الشاشة، وسيتواصل معك فريق الطوارئ فوراً لتوجيه السطحة لموقعك بالخبر.</div>
+                    <div class="faq-question"><span>ما هي فترات ومواعيد العمل الرسمية في المركز؟</span> <span>▼</span></div>
+                    <div class="faq-answer">نستقبلكم طوال أيام الأسبوع من السبت وحتى الخميس، من الساعة 8:00 صباحاً وحتى الساعة 8:00 مساءً بشكل متواصل، بينما يعتبر يوم الجمعة إجازة أسبوعية للمركز.</div>
+                </div>
+                <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-question"><span>هل تقدمون ضماناً على أعمال الصيانة وإصلاح المكائن؟</span> <span>▼</span></div>
+                    <div class="faq-answer">بالتأكيد، جميع أعمال الصيانة الميكانيكية وقطع الغيار وخدمات توضيب المحركات مشمولة بضمان معتمد يمنحك راحة البال والثقة التامة بجودة العمل المقدم.</div>
+                </div>
+                <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-question"><span>كيف يمكنني متابعة حالة طلب الصيانة أو الحجز الخاص بي؟</span> <span>▼</span></div>
+                    <div class="faq-answer">بمجرد إرسال حجزك عبر الموقع، سيظهر لك رقم الحجز الفوري وتحديث لحظي يخبرك بموقف الطلب (قيد الانتظار، مقبول، أو معتمد) بالإضافة لمتابعة الفواتير عبر حسابك الشخصي بالمنصة.</div>
+                </div>
+                <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-question"><span>هل تفحصون جميع طرازات بورش بما فيها الكهربائية (Taycan)؟</span> <span>▼</span></div>
+                    <div class="faq-answer">نعم، يمتلك المركز طاقماً فنياً وأجهزة متطورة مخصصة لفحص وصيانة وبرمجة كافة طرازات بورش الحديثة والكلاسيكية، بما في ذلك سيارة بورش تايكان (Taycan) الكهربائية بالكامل.</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 5. حجز الموعد مع اختيار طراز بورش والحاسبة -->
+    <!-- 5. حجز الموعد -->
     <div id="page-booking" class="page">
         <section class="form-section">
             <div class="form-container">
                 <h3>حجز موعد صيانة سريع ومباشر</h3>
-                <div class="work-hours-note">أيام العمل: من السبت إلى الخميس | الأوقات: 8:00 ص - 8:00 م</div>
+                <div class="work-hours-note">أيام العمل: السبت إلى الخميس | 8:00 ص - 8:00 م</div>
                 
                 <form onsubmit="handleNewBooking(event)">
                     <div class="form-group" id="guestNameGroup">
@@ -1160,7 +1094,6 @@
                         <input type="tel" id="bookGuestPhone" placeholder="05xxxxxxxx">
                     </div>
 
-                    <!-- اختيار طراز بورش بدقة -->
                     <div class="form-group">
                         <label>طراز سيارة بورش</label>
                         <select id="porscheModel" required>
@@ -1188,7 +1121,7 @@
 
                     <div class="form-group dynamic-field" id="field-vin-group">
                         <label>رقم الهيكل (VIN Number)</label>
-                        <input type="text" id="carVin" placeholder="أدخل رقم الهيكل المكون من 17 رمزاً">
+                        <input type="text" id="carVin" placeholder="أدخل رقم الهيكل">
                     </div>
 
                     <div class="form-group dynamic-field" id="field-chassis-group">
@@ -1202,69 +1135,52 @@
 
                     <div class="form-group dynamic-field" id="field-notes-group">
                         <label>ملاحظات عن نوع المشكلة أو العطل</label>
-                        <textarea id="carNotes" placeholder="يرجى وصف المشكلة أو الأعراض التي تظهر في سيارتك بالتفصيل..."></textarea>
+                        <textarea id="carNotes" placeholder="يرجى وصف المشكلة..."></textarea>
                     </div>
 
                     <div class="form-group">
-                        <label>التاريخ المناسب (YYYY-MM-DD)</label>
+                        <label>التاريخ المناسب</label>
                         <input type="date" id="bookDate" required lang="en-US" onchange="validateWorkDay(this)">
                     </div>
                     <div class="form-group">
-                        <label>الوقت المتاح (كل نصف ساعة)</label>
+                        <label>الوقت المتاح</label>
                         <select id="bookTime" required>
-                            <option value="" disabled selected>-- اختر وقت الحجز المناسب --</option>
+                            <option value="" disabled selected>-- اختر وقت الحجز --</option>
                             <option value="8:00 صباحاً">8:00 صباحاً</option>
-                            <option value="8:30 صباحاً">8:30 صباحاً</option>
                             <option value="9:00 صباحاً">9:00 صباحاً</option>
-                            <option value="9:30 صباحاً">9:30 صباحاً</option>
                             <option value="10:00 صباحاً">10:00 صباحاً</option>
-                            <option value="10:30 صباحاً">10:30 صباحاً</option>
                             <option value="11:00 صباحاً">11:00 صباحاً</option>
-                            <option value="11:30 صباحاً">11:30 صباحاً</option>
                             <option value="12:00 مساءً">12:00 مساءً</option>
-                            <option value="12:30 مساءً">12:30 مساءً</option>
                             <option value="1:00 مساءً">1:00 مساءً</option>
-                            <option value="1:30 مساءً">1:30 مساءً</option>
                             <option value="2:00 مساءً">2:00 مساءً</option>
-                            <option value="2:30 مساءً">2:30 مساءً</option>
                             <option value="3:00 مساءً">3:00 مساءً</option>
-                            <option value="3:30 مساءً">3:30 مساءً</option>
                             <option value="4:00 مساءً">4:00 مساءً</option>
-                            <option value="4:30 مساءً">4:30 مساءً</option>
                             <option value="5:00 مساءً">5:00 مساءً</option>
-                            <option value="5:30 مساءً">5:30 مساءً</option>
                             <option value="6:00 مساءً">6:00 مساءً</option>
-                            <option value="6:30 مساءً">6:30 مساءً</option>
                             <option value="7:00 مساءً">7:00 مساءً</option>
-                            <option value="7:30 مساءً">7:30 مساءً</option>
                             <option value="8:00 مساءً">8:00 مساءً</option>
                         </select>
                     </div>
                     <button type="submit" class="btn">إرسال طلب الحجز الفوري</button>
                 </form>
 
-                <!-- تذكرة الموعد الذكية التفاعلية -->
                 <div class="ticket-box status-pending" id="appointmentTicket">
                     <h4 id="ticketHeaderTitle">⏳ حالة الطلب: قيد الانتظار والمراجعة</h4>
                     <div class="ticket-item"><strong>اسم العميل:</strong> <span id="tickName">---</span></div>
-                    <div class="ticket-item"><strong>رقم هاتف العميل:</strong> <span id="tickPhone" style="direction: ltr; display: inline-block;">---</span></div>
+                    <div class="ticket-item"><strong>رقم هاتف العميل:</strong> <span id="tickPhone">---</span></div>
                     <div class="ticket-item"><strong>طراز السيارة:</strong> <span id="tickModel">---</span></div>
                     <div class="ticket-item"><strong>نوع الخدمة:</strong> <span id="tickService">---</span></div>
-                    
                     <div class="ticket-item" id="tickDynamicSpecs" style="background: #fdfdfd; padding: 6px; border-radius: 4px; display:none; font-size: 13px; border: 1px solid #eee;"></div>
-                    
-                    <div class="ticket-item"><strong>تاريخ ووقت الحجز:</strong> <span id="tickDateTime" class="ticket-datetime-output">---</span></div>
+                    <div class="ticket-item"><strong>تاريخ ووقت الحجز:</strong> <span id="tickDateTime">---</span></div>
                     
                     <div class="invoice-block">
                         <div class="invoice-title">
-                            <span>🧾 فاتورة مبدئية رقم: #<span id="invId">0000</span></span>
+                            <span>🧾 رقم الحجز: #<span id="invId">0000</span></span>
                             <span id="liveStatusBadge" class="badge-status badge-pending">في انتظار قرار الإدارة...</span>
                         </div>
-                        <div class="ticket-item" style="font-size:12px; margin-top:8px;"><strong>البيان:</strong> صيانة متخصصة لسيارات بورش</div>
-                        <div class="ticket-item" style="font-size:12px;"><strong>السعر النهائي المعتمد:</strong> <span id="invPrice" style="font-weight:bold; color:var(--porsche-orange);">يحدد لاحقاً من الإدارة</span></div>
-                        <div class="ticket-item" id="tickRejectionReason" style="font-size:11px; color:#c62828; margin-top:6px; display:none; background:#ffcdd2; padding:5px; border-radius:3px;"></div>
+                        <div class="ticket-item" style="font-size:12px; margin-top:8px;"><strong>السعر النهائي:</strong> <span id="invPrice" style="font-weight:bold; color:var(--porsche-orange);">يحدد لاحقاً من الإدارة</span></div>
                         <div class="ticket-item" style="font-size:11px; color:#444; font-weight: bold; margin-top: 8px; text-align: center;" id="liveStatusNote">
-                            * يقوم المسؤول الفني بالمركز الآن بمراجعة طلب الحجز وتأكيده من قاعدة البيانات.
+                            * يقوم المسؤول الفني بالمركز بمراجعة طلب الحجز الآن.
                         </div>
                     </div>
                 </div>
@@ -1278,19 +1194,11 @@
             <div class="form-container">
                 <h3>تسجيل الدخول للملاك</h3>
                 <form onsubmit="handleLogin(event)">
-                    <div class="form-group">
-                        <label>البريد الإلكتروني</label>
-                        <input type="email" id="loginEmail" required placeholder="example@domain.com">
-                    </div>
-                    <div class="form-group">
-                        <label>كلمة المرور</label>
-                        <input type="password" id="loginPassword" required placeholder="••••••••">
-                    </div>
+                    <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="loginEmail" required placeholder="example@domain.com"></div>
+                    <div class="form-group"><label>كلمة المرور</label><input type="password" id="loginPassword" required placeholder="••••••••"></div>
                     <button type="submit" class="btn">تسجيل الدخول</button>
                 </form>
-                <div class="form-redirect">
-                    ليس لديك حساب؟ <a onclick="navigateTo('register')">أنشئ حساباً جديداً</a>
-                </div>
+                <div class="form-redirect">ليس لديك حساب؟ <a onclick="navigateTo('register')">أنشئ حساباً جديداً</a></div>
             </div>
         </section>
     </div>
@@ -1301,27 +1209,13 @@
             <div class="form-container">
                 <h3>فتح حساب عميل جديد</h3>
                 <form onsubmit="handleRegister(event)">
-                    <div class="form-group">
-                        <label>الاسم بالكامل</label>
-                        <input type="text" id="regName" required placeholder="أدخل اسمك الكريم">
-                    </div>
-                    <div class="form-group">
-                        <label>البريد الإلكتروني</label>
-                        <input type="email" id="regEmail" required placeholder="name@example.com">
-                    </div>
-                    <div class="form-group">
-                        <label>رقم الجوال</label>
-                        <input type="tel" id="regPhone" required placeholder="05xxxxxxxx">
-                    </div>
-        <div class="form-group">
-                        <label>إنشاء كلمة المرور للحساب</label>
-                        <input type="password" id="regPassword" required placeholder="أدخل كلمة مرور قوية">
-                    </div>
+                    <div class="form-group"><label>الاسم بالكامل</label><input type="text" id="regName" required placeholder="أدخل اسمك الكريم"></div>
+                    <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="regEmail" required placeholder="name@example.com"></div>
+                    <div class="form-group"><label>رقم الجوال</label><input type="tel" id="regPhone" required placeholder="05xxxxxxxx"></div>
+                    <div class="form-group"><label>إنشاء كلمة المرور</label><input type="password" id="regPassword" required placeholder="أدخل كلمة المرور"></div>
                     <button type="submit" class="btn">إنشاء وحفظ الحساب</button>
                 </form>
-                <div class="form-redirect">
-                    ولديك حساب بالفعل؟ <a onclick="navigateTo('login')">تسجيل الدخول</a>
-                </div>
+                <div class="form-redirect">ولديك حساب بالفعل؟ <a onclick="navigateTo('login')">تسجيل الدخول</a></div>
             </div>
         </section>
     </div>
@@ -1330,9 +1224,29 @@
     <div id="page-admin" class="page">
         <section class="form-section">
             <div class="form-container admin-container" style="border-top-color: #2e7d32;">
-                <h3>🔐 لوحة التحكم الخاصة بالمسؤولين (الطلبات الواردة)</h3>
-                <p class="work-hours-note">إدارة واعتماد وتحديث طلبات الصيانة بشكل حي ومباشر من سحابة Firebase</p>
+                <h3>🔐 لوحة التحكم الخاصة بالمسؤولين (جميع الطلبات الواردة)</h3>
+                <p class="work-hours-note">إدارة واعتماد جميع الحجوزات وطلبات العملاء في مكان واحد</p>
                 
+                <!-- لوحة الإحصائيات والرسوم البيانية المبسطة -->
+                <div class="admin-stats-grid">
+                    <div class="admin-stat-card">
+                        <h4 id="statTotal">0</h4>
+                        <p>إجمالي الطلبات</p>
+                    </div>
+                    <div class="admin-stat-card" style="border-top-color: #2e7d32;">
+                        <h4 id="statAccepted" style="color: #4caf50;">0</h4>
+                        <p>الحجوزات المقبولة</p>
+                    </div>
+                    <div class="admin-stat-card" style="border-top-color: #ff9800;">
+                        <h4 id="statPending" style="color: #ffb74d;">0</h4>
+                        <p>قيد الانتظار</p>
+                    </div>
+                    <div class="admin-stat-card" style="border-top-color: #f44336;">
+                        <h4 id="statRejected" style="color: #ef5350;">0</h4>
+                        <p>الطلبات المرفوضة</p>
+                    </div>
+                </div>
+
                 <div class="table-responsive" style="overflow-x: auto; margin-bottom: 25px;">
                     <table class="table table-bordered align-middle" style="width: 100%; border-collapse: collapse; text-align: right; background: #111; color: white;">
                         <thead>
@@ -1345,7 +1259,7 @@
                             </tr>
                         </thead>
                         <tbody id="bookingsTableBody">
-                            <!-- سيتم تعبئة الطلبات ديناميكياً من Firebase هنا فوراً -->
+                            <!-- تظهر هنا جميع الطلبات الواردة والإحصائيات تلقائياً -->
                         </tbody>
                     </table>
                 </div>
@@ -1363,7 +1277,7 @@
             <div class="footer-social">
                 <a href="https://www.tiktok.com/@adamautoservices" target="_blank" class="social-btn tiktok-btn">📱 تيك توك: adamautoservices</a>
                 <a href="https://www.instagram.com/adamautoservise" target="_blank" class="social-btn instagram-btn">📸 إنستغرام: adamautoservise</a>
-                <a href="https://wa.me/966547070334" target="_blank" class="social-btn phone-btn">📞 اتصل أو واتساب إدارة المركز: +966 54 707 0334</a>
+           <a href="https://wa.me/966547070334" target="_blank" class="social-btn phone-btn">📞 واتساب إدارة المركز: +966 54 707 0334</a>
             </div>
             <div class="copyright">
                 <p>©️ 2026 مركز آدم لصيانة السيارات. جميع الحقوق محفوظة.</p>
