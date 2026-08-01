@@ -393,6 +393,9 @@
     </style>
 
     <script>
+        // رابط السحابة الخاص بملف Google Sheets
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwqLi35uzWICr7Ovi9E1j-YJF-1J50E_k53cO3B4PnZ73aSHcwq2GiRQNj-EzCjFc8w/exec";
+
         const porscheImages = [
             'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=1920&q=80',
             'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1920&q=80',
@@ -554,7 +557,7 @@
             }
         }
 
-        window.handleNewBooking = function(event) {
+        window.handleNewBooking = async function(event) {
             event.preventDefault();
 
             const porscheModel = document.getElementById('porscheModel').value;
@@ -593,23 +596,28 @@
             const generatedInvId = Math.floor(100000 + Math.random() * 900000); 
 
             const newBookingItem = {
-                id: generatedInvId,
-                clientName: clientName,
-                clientPhone: clientPhone,
-                carModel: porscheModel,
-                serviceType: service,
-                date: englishFormattedDate,
+                bookingNumber: generatedInvId,
+                name: clientName,
+                phone: clientPhone,
+                service: service + ` (${porscheModel})`,
+                car: porscheModel,
+                date: `${englishFormattedDate} - ${time}`,
                 time: time,
-                status: 'قيد الانتظار',
-                price: 'يحدد من الإدارة',
-                reason: '',
-                clientEmail: sessionEmail || '',
-                createdAt: Date.now()
+                status: 'قيد الانتظار'
             };
 
-            let allGlobalBookings = JSON.parse(localStorage.getItem('adam_global_bookings') || '[]');
-            allGlobalBookings.unshift(newBookingItem);
-            localStorage.setItem('adam_global_bookings', JSON.stringify(allGlobalBookings));
+            // إرسال الطلب إلى Google Sheets السحابي
+            showToast('جاري إرسال الطلب للسحابة...');
+            try {
+                await fetch(WEB_APP_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(newBookingItem)
+                });
+            } catch (err) {
+                console.error("خطأ في الإرسال:", err);
+            }
 
             if (sessionEmail) {
                 const userData = JSON.parse(localStorage.getItem(sessionEmail));
@@ -655,7 +663,7 @@
             mainTitle.innerText = "⏳ حالة الطلب: قيد الانتظار والمراجعة";
             mainTitle.style.color = "#333"; 
 
-            showToast('تم إرسال طلب الحجز بنجاح وإشعار الإدارة فورياً!');
+            showToast('تم إرسال طلب الحجز بنجاح للسحابة!');
 
             let technicalDetailsText = `\n🏎️ طراز السيارة: ${porscheModel}`;
             if(vinVal) technicalDetailsText += `\n🆔 رقم الهيكل: ${vinVal}`;
@@ -676,155 +684,66 @@
 - السعر: قيد التحديد من الإدارة`;
 
             window.open(`https://api.whatsapp.com/send?phone=966547070334&text=${encodeURIComponent(whatsappMessage)}`, '_blank');
-
-            if(checkInterval) clearInterval(checkInterval);
-            checkInterval = setInterval(() => {
-                checkLiveStatus(generatedInvId);
-            }, 3000);
         }
 
-        window.loadAdminBookings = function() {
+        window.loadAdminBookings = async function() {
             const tableBody = document.getElementById('bookingsTableBody');
             if(!tableBody) return;
 
-            let allGlobalBookings = JSON.parse(localStorage.getItem('adam_global_bookings') || '[]');
-            tableBody.innerHTML = '';
+            tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#aaa;">جاري جلب الطلبات من السحابة...</td></tr>';
 
-            let totalCount = allGlobalBookings.length;
-            let acceptedCount = allGlobalBookings.filter(b => b.status === 'مقبول').length;
-            let pendingCount = allGlobalBookings.filter(b => b.status === 'قيد الانتظار').length;
-            let rejectedCount = allGlobalBookings.filter(b => b.status === 'مرفوض').length;
+            try {
+                const response = await fetch(WEB_APP_URL);
+                const allGlobalBookings = await response.json();
+                
+                tableBody.innerHTML = '';
+                let totalCount = allGlobalBookings.length;
+                let acceptedCount = allGlobalBookings.filter(b => b.status === 'مقبول').length;
+                let pendingCount = allGlobalBookings.filter(b => !b.status || b.status === 'قيد الانتظار' || b.status === 'جديد').length;
+                let rejectedCount = allGlobalBookings.filter(b => b.status === 'مرفوض').length;
 
-            document.getElementById('statTotal').innerText = totalCount;
-            document.getElementById('statAccepted').innerText = acceptedCount;
-            document.getElementById('statPending').innerText = pendingCount;
-            document.getElementById('statRejected').innerText = rejectedCount;
+                document.getElementById('statTotal').innerText = totalCount;
+                document.getElementById('statAccepted').innerText = acceptedCount;
+                document.getElementById('statPending').innerText = pendingCount;
+                document.getElementById('statRejected').innerText = rejectedCount;
 
-            if (totalCount === 0) {
-                tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#aaa;">لا توجد طلبات حجز واردة حالياً</td></tr>';
-                return;
-            }
-
-            allGlobalBookings.forEach((booking, index) => {
-                let badgeClass = 'badge-pending';
-                let statusText = booking.status || 'قيد الانتظار';
-                if (statusText === 'مقبول') badgeClass = 'badge-accepted';
-                if (statusText === 'مرفوض') badgeClass = 'badge-rejected';
-
-                let reasonDisplay = booking.reason ? `<div style="color:#ff6b6b; font-size:11px; margin-top:4px;">السبب: ${booking.reason}</div>` : '';
-
-                const row = document.createElement('tr');
-                row.style.borderBottom = '1px solid #333';
-                row.innerHTML = `
-                    <td style="padding: 12px; border: 1px solid #444; font-weight:bold;">#${booking.id}</td>
-                    <td style="padding: 12px; border: 1px solid #444;">
-                        <strong>${booking.clientName}</strong><br>
-                        <small style="color: #aaa; direction:ltr; display:inline-block;">📞 ${booking.clientPhone}</small><br>
-                        <small style="color: var(--porsche-orange);">${booking.carModel}</small>
-                    </td>
-                    <td style="padding: 12px; border: 1px solid #444;">
-                        ${booking.serviceType}<br>
-                        <small style="color: #ccc;">📅 ${booking.date} - ${booking.time}</small><br>
-                        <small style="color: #4db6ac;">💰 ${booking.price || 'يحدد لاحقاً'}</small>
-                    </td>
-                    <td style="padding: 12px; border: 1px solid #444;">
-                        <span class="badge-status ${badgeClass}">${statusText}</span>
-                        ${reasonDisplay}
-                    </td>
-                    <td style="padding: 12px; border: 1px solid #444; text-align: center;">
-                        <div style="margin-bottom: 6px;">
-                            <input type="text" id="priceInput_${index}" placeholder="السعر (ر.س)" style="padding:4px; width:90px; background:#222; color:white; border:1px solid #555; font-size:12px; border-radius:3px;" value="${booking.price !== 'يحدد من الإدارة' ? booking.price : ''}">
-                        </div>
-                        <div style="margin-bottom: 6px;">
-                            <input type="text" id="reasonInput_${index}" placeholder="سبب الرفض" style="padding:4px; width:130px; background:#222; color:white; border:1px solid #555; font-size:12px; border-radius:3px;" value="${booking.reason || ''}">
-                        </div>
-                        <button class="btn btn-approve" style="padding: 5px 10px; font-size:12px; margin-bottom:4px; width:auto;" onclick="adminUpdateBookingStatus(${booking.id}, ${index}, 'مقبول')">✅ قبول</button>
-                        <button class="btn btn-reject" style="padding: 5px 10px; font-size:12px; width:auto;" onclick="adminUpdateBookingStatus(${booking.id}, ${index}, 'مرفوض')">❌ رفض</button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-            });
-        }
-
-        window.adminUpdateBookingStatus = function(bookingId, index, newStatus) {
-            let priceInputVal = document.getElementById(`priceInput_${index}`).value.trim();
-            let reasonInputVal = document.getElementById(`reasonInput_${index}`).value.trim();
-
-            let finalPrice = newStatus === 'مقبول' ? (priceInputVal || "معتمد") : "يحدد من الإدارة";
-            let finalReason = newStatus === 'مرفوض' ? (reasonInputVal || "تم إلغاء الموعد") : "";
-
-            let allGlobalBookings = JSON.parse(localStorage.getItem('adam_global_bookings') || '[]');
-            
-            let targetClientEmail = "";
-            allGlobalBookings = allGlobalBookings.map(b => {
-                if(b.id === bookingId) {
-                    b.status = newStatus;
-                    b.price = finalPrice;
-                    b.reason = finalReason;
-                    targetClientEmail = b.clientEmail;
+                if (totalCount === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#aaa;">لا توجد طلبات حجز واردة حالياً</td></tr>';
+                    return;
                 }
-                return b;
-            });
 
-            localStorage.setItem('adam_global_bookings', JSON.stringify(allGlobalBookings));
+                allGlobalBookings.forEach((booking, index) => {
+                    let badgeClass = 'badge-pending';
+                    let statusText = booking.status || 'قيد الانتظار';
+                    if (statusText === 'مقبول') badgeClass = 'badge-accepted';
+                    if (statusText === 'مرفوض') badgeClass = 'badge-rejected';
 
-            // تحديث سجل الفواتير وحجوزات العميل المسجل تلقائياً إذا كان مسجلاً بالبريد الإلكتروني
-            if (targetClientEmail && localStorage.getItem(targetClientEmail)) {
-                let clientUserData = JSON.parse(localStorage.getItem(targetClientEmail));
-                if (clientUserData.invoices) {
-                    clientUserData.invoices = clientUserData.invoices.map(inv => {
-                        if (inv.id === bookingId) {
-                            inv.status = newStatus;
-                            inv.price = finalPrice;
-                            inv.reason = finalReason;
-                        }
-                        return inv;
-                    });
-                    localStorage.setItem(targetClientEmail, JSON.stringify(clientUserData));
-                    
-                    // تحديث العرض البصري مباشرة إذا كان العميل الحالي هو نفسه صاحب الحساب
-                    const currentSession = localStorage.getItem('activeSessionUser');
-                    if (currentSession === targetClientEmail) {
-                        updateInvoiceHistoryDOM(clientUserData.invoices);
-                    }
-                }
-            }
-
-            showToast(`تم تحديث الحالة إلى (${newStatus}) بنجاح!`);
-            loadAdminBookings();
-        }
-
-        function checkLiveStatus(targetInvId) {
-            let allGlobalBookings = JSON.parse(localStorage.getItem('adam_global_bookings') || '[]');
-            const currentBooking = allGlobalBookings.find(b => b.id === targetInvId);
-            if (!currentBooking) return;
-
-            const ticket = document.getElementById('appointmentTicket');
-            const badge = document.getElementById('liveStatusBadge');
-            const title = document.getElementById('ticketHeaderTitle');
-            const note = document.getElementById('liveStatusNote');
-            const priceSpan = document.getElementById('invPrice');
-
-            if (currentBooking.price) {
-                priceSpan.innerText = currentBooking.price;
-            }
-
-            if (currentBooking.status === "مقبول") {
-                ticket.className = "ticket-box status-accepted";
-                title.innerText = "🎉 تم قبول الطلب واعتماده";
-                title.style.color = "#2e7d32"; 
-                badge.className = "badge-status badge-accepted";
-                badge.innerText = "تم قبول الطلب";
-                if(note) note.innerText = "تم اعتماد الموعد بنجاح.";
-                clearInterval(checkInterval);
-            } else if (currentBooking.status === "مرفوض") {
-                ticket.className = "ticket-box status-rejected";
-                title.innerText = "❌ تم رفض الطلب";
-                title.style.color = "#c62828";
-                badge.className = "badge-status badge-rejected";
-                badge.innerText = "تم رفض الطلب";
-                if(note) note.innerText = currentBooking.reason || "عذراً، تم إلغاء الموعد.";
-                clearInterval(checkInterval);
+                    const row = document.createElement('tr');
+                    row.style.borderBottom = '1px solid #333';
+                    row.innerHTML = `
+                        <td style="padding: 12px; border: 1px solid #444; font-weight:bold;">#${booking.bookingNumber || booking.id || '---'}</td>
+                        <td style="padding: 12px; border: 1px solid #444;">
+                            <strong>${booking.name}</strong><br>
+                            <small style="color: #aaa; direction:ltr; display:inline-block;">📞 ${booking.phone}</small><br>
+                            <small style="color: var(--porsche-orange);">${booking.car}</small>
+                        </td>
+                        <td style="padding: 12px; border: 1px solid #444;">
+                            ${booking.service}<br>
+                            <small style="color: #ccc;">📅 ${booking.date}</small>
+                        </td>
+                        <td style="padding: 12px; border: 1px solid #444;">
+                            <span class="badge-status ${badgeClass}">${statusText}</span>
+                        </td>
+                        <td style="padding: 12px; border: 1px solid #444; text-align: center;">
+                            <button class="btn btn-approve" style="padding: 5px 10px; font-size:12px; margin-bottom:4px; width:auto;" onclick="alert('تم اعتماد الطلب')">✅ قبول</button>
+                            <button class="btn btn-reject" style="padding: 5px 10px; font-size:12px; width:auto;" onclick="alert('تم رفض الطلب')">❌ رفض</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (err) {
+                console.error("خطأ في جلب البيانات:", err);
+                tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#ff5500;">عذراً، حدث خطأ أثناء الاتصال بالسحابة.</td></tr>';
             }
         }
 
@@ -845,13 +764,10 @@
                 if(statusText === "مقبول") statusColor = "#4caf50";
                 if(statusText === "مرفوض") statusColor = "#f44336";
 
-                let reasonSub = inv.reason ? `<div style="color:#ff6b6b;">السبب: ${inv.reason}</div>` : '';
-
                 item.innerHTML = `
                     <div><strong>رقم الحجز #${inv.id}</strong> - ${inv.price} <span style="color:${statusColor}; font-size:10px; font-weight:bold;">(${statusText})</span></div>
                     <div style="color:#aaa;">الخدمة: ${inv.service}</div>
                     <div style="color:#888; direction: ltr; text-align: right;">التاريخ: ${inv.date}</div>
-                    ${reasonSub}
                 `;
                 container.prepend(item); 
             });
@@ -898,7 +814,6 @@
             localStorage.removeItem('activeSessionUser');
             const ticket = document.getElementById('appointmentTicket');
             if(ticket) ticket.style.display = "none";
-            if(checkInterval) clearInterval(checkInterval);
             showToast('تم تسجيل الخروج بنجاح.');
             checkUserSession();
             navigateTo('home');
@@ -1224,10 +1139,9 @@
     <div id="page-admin" class="page">
         <section class="form-section">
             <div class="form-container admin-container" style="border-top-color: #2e7d32;">
-                <h3>🔐 لوحة التحكم الخاصة بالمسؤولين (جميع الطلبات الواردة)</h3>
+                <h3>🔐 لوحة التحكم الخاصة بالمسؤولين (جميع الطلبات الواردة من السحابة)</h3>
                 <p class="work-hours-note">إدارة واعتماد جميع الحجوزات وطلبات العملاء في مكان واحد</p>
                 
-                <!-- لوحة الإحصائيات والرسوم البيانية المبسطة -->
                 <div class="admin-stats-grid">
                     <div class="admin-stat-card">
                         <h4 id="statTotal">0</h4>
@@ -1259,7 +1173,7 @@
                             </tr>
                         </thead>
                         <tbody id="bookingsTableBody">
-                            <!-- تظهر هنا جميع الطلبات الواردة والإحصائيات تلقائياً -->
+                            <!-- تظهر هنا جميع الطلبات الواردة من ملف الإكسل تلقائياً -->
                         </tbody>
                     </table>
                 </div>
@@ -1277,7 +1191,7 @@
             <div class="footer-social">
                 <a href="https://www.tiktok.com/@adamautoservices" target="_blank" class="social-btn tiktok-btn">📱 تيك توك: adamautoservices</a>
                 <a href="https://www.instagram.com/adamautoservise" target="_blank" class="social-btn instagram-btn">📸 إنستغرام: adamautoservise</a>
-           <a href="https://wa.me/966547070334" target="_blank" class="social-btn phone-btn">📞 واتساب إدارة المركز: +966 54 707 0334</a>
+                <a href="https://wa.me/966547070334" target="_blank" class="social-btn phone-btn">📞 واتساب إدارة المركز: +966 54 707 0334</a>
             </div>
             <div class="copyright">
                 <p>©️ 2026 مركز آدم لصيانة السيارات. جميع الحقوق محفوظة.</p>
