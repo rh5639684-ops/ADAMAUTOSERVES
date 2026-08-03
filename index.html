@@ -586,41 +586,52 @@
             }
         }
 
-        async function checkClientBookingStatus() {
-            const currentInvId = document.getElementById('invId');
-            if (!currentInvId || currentInvId.innerText === "0000") return;
+// دالة محدثة لجلب سجل الحجوزات الخاص بالعميل من السحابة مباشرة بناءً على رقم جواله أو بريده
+async function loadClientHistoryFromCloud(clientPhone) {
+    const container = document.getElementById('invoiceHistoryContainer');
+    if(!container) return;
+    
+    container.innerHTML = '<span style="font-size: 12px; color:#aaa;">جاري تحديث السجل من السحابة...</span>';
 
-            let targetId = currentInvId.innerText;
-            let cloudBookings = await getBookingsFromCloud();
-            
-            if (cloudBookings && cloudBookings.length > 0) {
-                let found = cloudBookings.find(b => String(b.bookingNumber || b.id) === String(targetId));
-                if (found) {
-                    let serverStatus = found.status || 'قيد الانتظار';
-                    let serverPrice = found.price || 'يحدد من الإدارة';
-                    let serverReason = found.reason || '';
+    let allBookings = await getBookingsFromCloud();
+    if (!allBookings || allBookings.length === 0) {
+        container.innerHTML = '<span style="font-size: 12px; color:#777;">لا يوجد حجوزات سابقة.</span>';
+        return;
+    }
 
-                    const ticketBox = document.getElementById('appointmentTicket');
-                    const liveBadge = document.getElementById('liveStatusBadge');
-                    const mainTitle = document.getElementById('ticketHeaderTitle');
-                    const invPrice = document.getElementById('invPrice');
+    // تصفية الحجوزات الخاصة بهذا العميل فقط بناءً على رقم الجوال المسجل في الجلسة
+    let clientBookings = allBookings.filter(b => String(b.phone || b.clientPhone) === String(clientPhone));
 
-                    if (serverStatus === 'مقبول' || serverStatus === 'تم قبول الطلب') {
-                        ticketBox.className = "ticket-box status-accepted";
-                        liveBadge.className = "badge-status badge-accepted";
-                        liveBadge.innerText = "مقبول";
-                        mainTitle.innerText = "✅ حالة الطلب: تم قبول الموعد بنجاح";
-                        invPrice.innerText = serverPrice;
-                    } else if (serverStatus === 'مرفوض' || serverStatus === 'تم رفض الطلب') {
-                        ticketBox.className = "ticket-box status-rejected";
-                        liveBadge.className = "badge-status badge-rejected";
-                        liveBadge.innerText = "مرفوض";
-                        mainTitle.innerText = "❌ حالة الطلب: تم رفض الموعد" + (serverReason ? ` (${serverReason})` : "");
-                        invPrice.innerText = serverPrice;
-                    }
-                }
-            }
-        }
+    if (clientBookings.length === 0) {
+        container.innerHTML = '<span style="font-size: 12px; color:#777;">لا يوجد حجوزات سابقة.</span>';
+        return;
+    }
+
+    container.innerHTML = '';
+    clientBookings.forEach(inv => {
+        const item = document.createElement('div');
+        item.className = 'invoice-item';
+        
+        let statusColor = "#ffb74d";
+        let statusText = inv.status || 'قيد الانتظار';
+        if(statusText === "مقبول" || statusText === "تم قبول الطلب") statusColor = "#81c784";
+        if(statusText === "مرفوض" || statusText === "تم رفض الطلب") statusColor = "#e57373";
+
+        let reasonSub = inv.reason ? `<div style="color:#ff6b6b;">السبب: ${inv.reason}</div>` : '';
+        let bId = inv.bookingNumber || inv.id || '---';
+        let bPrice = inv.price || 'يحدد من الإدارة';
+        let bService = inv.service || 'صيانة';
+        let bDate = inv.date || '';
+
+        item.innerHTML = `
+            <div><strong>رقم الحجز #${bId}</strong> - <span style="color:var(--porsche-orange);">${bPrice}</span> <span style="color:${statusColor}; font-size:11px; font-weight:bold;">(${statusText})</span></div>
+            <div style="color:#bbb;">الخدمة: ${bService}</div>
+            <div style="color:#888; direction: ltr; text-align: right;">التاريخ: ${bDate}</div>
+            ${reasonSub}
+        `;
+        container.prepend(item);
+    });
+}
 
         setInterval(checkClientBookingStatus, 5000);
 
