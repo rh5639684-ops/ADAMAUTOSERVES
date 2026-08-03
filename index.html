@@ -5,11 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>آدم أوتو سيرفس | صيانة بورش الاحترافية ونظام الحجوزات السحابي</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap');
 
         :root {
-            --porsche-black: #0d0d0d;
-            --porsche-orange: #ff5500; 
+            --porsche-black: #0a0a0a;
+            --porsche-surface: #141414;
+            --porsche-card: #1f1f1f;
+            --porsche-orange: #ff5500;
+            --porsche-orange-glow: rgba(255, 85, 0, 0.4);
             --porsche-silver: #e5e5e5;
             --porsche-light-gray: #f4f4f6;
             --porsche-dark-gray: #1a1a1a;
@@ -25,50 +28,56 @@
         }
 
         body {
-            background-color: #fff;
-            color: var(--text-dark);
+            background-color: var(--porsche-black);
+            color: var(--text-light);
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
 
         header {
-            background-color: var(--porsche-black);
+            background-color: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
             position: fixed;
             top: 0;
             width: 100%;
             z-index: 1000;
             border-bottom: 2px solid var(--porsche-orange);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
 
         .nav-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            max-width: 1200px;
+            max-width: 1280px;
             margin: 0 auto;
-            padding: 15px 20px;
+            padding: 15px 25px;
         }
 
         .logo {
             color: var(--text-light);
-            font-size: 26px;
-            font-weight: 700;
+            font-size: 24px;
+            font-weight: 900;
             letter-spacing: 1.5px;
             cursor: pointer;
             white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
+        .logo span { color: var(--porsche-orange); text-shadow: 0 0 10px var(--porsche-orange-glow); }
 
         nav {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
         }
 
-        nav ul { display: flex; list-style: none; gap: 15px; align-items: center; }
+        nav ul { display: flex; list-style: none; gap: 18px; align-items: center; }
 
         nav ul li a {
-            color: var(--text-light);
+            color: #ccc;
             text-decoration: none;
             font-size: 14px;
             font-weight: 500;
@@ -76,26 +85,27 @@
             cursor: pointer;
         }
 
-        nav ul li a:hover, nav ul li a.active { color: var(--porsche-orange); }
+        nav ul li a:hover, nav ul li a.active { color: var(--porsche-orange); text-shadow: 0 0 8px var(--porsche-orange-glow); }
 
         #toast-container {
             position: fixed;
-            bottom: 20px;
-            left: 20px;
+            bottom: 30px;
+            left: 30px;
             z-index: 9999;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
         }
         .toast {
-            background: var(--porsche-black);
+            background: var(--porsche-surface);
             color: white;
-            padding: 12px 20px;
-            border-radius: 4px;
-            border-right: 4px solid var(--porsche-orange);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            padding: 14px 24px;
+            border-radius: 6px;
+            border-right: 5px solid var(--porsche-orange);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
             font-size: 14px;
             animation: slideInLeft 0.3s ease, fadeOut 0.3s ease 3.7s forwards;
+            font-weight: 500;
         }
         @keyframes slideInLeft { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOut { to { opacity: 0; transform: translateY(10px); } }
@@ -106,75 +116,76 @@
         }
 
         .user-badge {
-            background-color: #222;
+            background-color: var(--porsche-card);
             color: white;
-            padding: 6px 12px;
-            border-radius: 4px;
+            padding: 8px 16px;
+            border-radius: 6px;
             font-size: 13px;
             cursor: pointer;
-            border: 1px solid #444;
+            border: 1px solid #333;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             transition: 0.3s;
+            font-weight: 600;
         }
 
-        .user-badge:hover { border-color: var(--porsche-orange); }
-        .user-badge::before { content: '👤'; font-size: 15px; }
+        .user-badge:hover { border-color: var(--porsche-orange); box-shadow: 0 0 12px var(--porsche-orange-glow); }
 
         .profile-dropdown {
             display: none;
             position: absolute;
-            top: 45px;
+            top: 50px;
             left: 0;
-            background-color: #252525;
+            background-color: var(--porsche-surface);
             border-top: 3px solid var(--porsche-orange);
-            min-width: 280px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
-            border-radius: 4px;
-            padding: 15px;
+            min-width: 300px;
+            box-shadow: 0 12px 35px rgba(0,0,0,0.7);
+            border-radius: 6px;
+            padding: 20px;
             z-index: 1010;
             color: white;
             text-align: right;
         }
 
-        .profile-dropdown.show { display: block; }
-        .profile-dropdown h5 { font-size: 15px; border-bottom: 1px solid #444; padding-bottom: 8px; margin-bottom: 10px; color: var(--porsche-orange); }
-        .profile-dropdown p { font-size: 13px; color: #ccc; margin-bottom: 8px; direction: ltr; text-align: right; }
+        .profile-dropdown.show { display: block; animation: fadeIn 0.2s ease; }
+        .profile-dropdown h5 { font-size: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 12px; color: var(--porsche-orange); }
+        .profile-dropdown p { font-size: 13px; color: #aaa; margin-bottom: 8px; direction: ltr; text-align: right; }
         .profile-dropdown p strong { color: white; direction: rtl; display: inline-block; }
 
         .history-section {
             margin-top: 15px;
-            border-top: 1px dashed #444;
-            padding-top: 10px;
-            max-height: 180px;
+            border-top: 1px dashed #333;
+            padding-top: 12px;
+            max-height: 200px;
             overflow-y: auto;
         }
-        .history-section h6 { font-size: 12px; color: #aaa; margin-bottom: 8px; }
+        .history-section h6 { font-size: 12px; color: #888; margin-bottom: 10px; }
         .invoice-item {
             background: #111;
-            padding: 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            margin-bottom: 6px;
-            border-right: 2px solid var(--porsche-orange);
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            margin-bottom: 8px;
+            border-right: 3px solid var(--porsche-orange);
+            border: 1px solid #222;
         }
-        .invoice-item div { margin-bottom: 2px; }
+        .invoice-item div { margin-bottom: 3px; }
 
         .logout-btn {
-            background-color: #333; color: #ff6600; border: none; padding: 8px; width: 100%; margin-top: 10px;
-            cursor: pointer; font-weight: bold; border-radius: 3px; transition: 0.3s;
+            background-color: #222; color: var(--porsche-orange); border: 1px solid #444; padding: 10px; width: 100%; margin-top: 12px;
+            cursor: pointer; font-weight: bold; border-radius: 4px; transition: 0.3s;
         }
-        .logout-btn:hover { background-color: var(--porsche-orange); color: white; }
+        .logout-btn:hover { background-color: var(--porsche-orange); color: white; border-color: var(--porsche-orange); }
 
-        .page { display: none; padding-top: 70px; flex: 1; }
-        .page.active-page { display: block; animation: fadeIn 0.5s ease; }
+        .page { display: none; padding-top: 75px; flex: 1; }
+        .page.active-page { display: block; animation: fadeIn 0.4s ease; }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         .hero {
             position: relative;
-            height: 75vh;
+            height: 80vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -182,205 +193,211 @@
             text-align: center;
             color: white;
             padding: 20px;
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6));
-            background-size: cover;
-            background-position: center;
+            background: linear-gradient(rgba(10,10,10,0.7), rgba(10,10,10,0.85)), url('https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
         }
 
-        .hero h1 { font-size: 42px; margin-bottom: 15px; font-weight: 700; }
-        .hero p { font-size: 17px; max-width: 600px; line-height: 1.6; }
+        .hero h1 { font-size: 48px; margin-bottom: 15px; font-weight: 900; letter-spacing: -1px; }
+        .hero p { font-size: 18px; max-width: 650px; line-height: 1.7; color: #ccc; margin-bottom: 25px; }
 
         .stats-bar {
-            background-color: var(--porsche-black);
+            background-color: var(--porsche-surface);
             color: white;
-            padding: 30px 20px;
+            padding: 35px 20px;
             border-bottom: 3px solid var(--porsche-orange);
+            border-top: 1px solid #222;
         }
         .stats-grid {
             max-width: 1200px;
             margin: 0 auto;
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
+            gap: 25px;
             text-align: center;
         }
-        .stat-box h3 { font-size: 32px; color: var(--porsche-orange); margin-bottom: 5px; font-weight: 700; }
-        .stat-box p { font-size: 14px; color: #bbb; }
+        .stat-box h3 { font-size: 36px; color: var(--porsche-orange); margin-bottom: 8px; font-weight: 900; text-shadow: 0 0 15px var(--porsche-orange-glow); }
+        .stat-box p { font-size: 14px; color: #aaa; font-weight: 500; }
 
-        #page-about { background-color: var(--porsche-light-gray); padding-bottom: 60px; }
-        .about-header { text-align: center; padding: 40px 20px; background-color: var(--porsche-black); margin-bottom: 40px; border-bottom: 3px solid var(--porsche-orange); }
-        .about-header h2 { font-size: 32px; color: #ffffff; margin-bottom: 10px; }
-        .about-header p { color: #ccc; font-size: 16px; }
-        .about-section { max-width: 1000px; margin: 0 auto; }
-        .about-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; padding: 0 20px; }
-        .about-box { background: white; border: 1px solid #e1e1e5; padding: 30px; border-radius: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.03); }
-        .about-box h3 { color: var(--porsche-black); font-size: 20px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; border-right: 3px solid var(--porsche-orange); padding-right: 10px; }
+        #page-about { background-color: var(--porsche-black); padding-bottom: 60px; }
+        .about-header { text-align: center; padding: 50px 20px; background-color: var(--porsche-surface); margin-bottom: 40px; border-bottom: 3px solid var(--porsche-orange); }
+        .about-header h2 { font-size: 34px; color: #ffffff; margin-bottom: 10px; font-weight: 700; }
+        .about-header p { color: #aaa; font-size: 16px; }
+        .about-section { max-width: 1050px; margin: 0 auto; }
+        .about-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; padding: 0 20px; }
+        .about-box { background: var(--porsche-surface); border: 1px solid #262626; padding: 35px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+        .about-box h3 { color: white; font-size: 20px; margin-bottom: 18px; display: flex; align-items: center; gap: 12px; border-right: 4px solid var(--porsche-orange); padding-right: 12px; }
         .about-box ul { list-style: none; }
-        .about-box ul li { margin-bottom: 12px; font-size: 15px; color: #444; line-height: 1.6; position: relative; padding-right: 20px; }
+        .about-box ul li { margin-bottom: 14px; font-size: 15px; color: #bbb; line-height: 1.6; position: relative; padding-right: 24px; }
         .about-box ul li::before { content: '✔'; position: absolute; right: 0; color: var(--porsche-orange); font-weight: bold; }
 
-        #page-services { background-color: var(--porsche-silver); padding-bottom: 60px; }
-        .services-container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
-        .section-title { text-align: center; font-size: 30px; margin-bottom: 40px; color: var(--porsche-black); }
-        .section-title::after { content: ''; display: block; width: 50px; height: 3px; background: var(--porsche-orange); margin: 10px auto; }
-        .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 25px; }
+        #page-services { background-color: var(--porsche-black); padding-bottom: 70px; }
+        .services-container { max-width: 1280px; margin: 40px auto; padding: 0 25px; }
+        .section-title { text-align: center; font-size: 32px; margin-bottom: 40px; color: white; font-weight: 800; }
+        .section-title::after { content: ''; display: block; width: 60px; height: 3px; background: var(--porsche-orange); margin: 12px auto; box-shadow: 0 0 10px var(--porsche-orange-glow); }
+        .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
         
         .service-card { 
-            background: white; 
-            padding: 25px 20px; 
-            border-radius: 6px; 
+            background: var(--porsche-surface); 
+            padding: 30px 25px; 
+            border-radius: 8px; 
             text-align: center; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
             transition: 0.3s; 
-            border-bottom: 3px solid transparent; 
+            border: 1px solid #222;
+            border-bottom: 4px solid transparent; 
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 300px;
+            min-height: 320px;
         }
-        .service-card:hover { transform: translateY(-8px); border-bottom-color: var(--porsche-orange); }
-        .service-icon { font-size: 40px; margin-bottom: 10px; color: var(--porsche-orange); }
-        .service-card h3 { font-size: 19px; color: var(--porsche-black); margin-bottom: 10px; }
-        .service-card p { font-size: 13px; color: #555; line-height: 1.5; margin-bottom: 20px; flex-grow: 1; }
+        .service-card:hover { transform: translateY(-8px); border-bottom-color: var(--porsche-orange); border-color: #333; box-shadow: 0 15px 40px rgba(255,85,0,0.15); }
+        .service-icon { font-size: 44px; margin-bottom: 15px; color: var(--porsche-orange); }
+        .service-card h3 { font-size: 20px; color: white; margin-bottom: 12px; font-weight: 700; }
+        .service-card p { font-size: 14px; color: #aaa; line-height: 1.6; margin-bottom: 20px; flex-grow: 1; }
         
         .service-book-btn {
-            background-color: var(--porsche-black); color: #fff; border: none; padding: 10px 15px; font-size: 13px;
-            font-weight: bold; border-radius: 4px; cursor: pointer; transition: 0.3s; width: 100%;
+            background-color: var(--porsche-card); color: #fff; border: 1px solid #444; padding: 12px; font-size: 14px;
+            font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.3s; width: 100%;
         }
-        .service-book-btn:hover { background-color: var(--porsche-orange); }
+        .service-book-btn:hover { background-color: var(--porsche-orange); border-color: var(--porsche-orange); box-shadow: 0 0 15px var(--porsche-orange-glow); }
 
-        .faq-container { max-width: 800px; margin: 0 auto; }
-        .faq-item { background: white; margin-bottom: 15px; border-radius: 4px; overflow: hidden; border: 1px solid #ddd; }
-        .faq-question { background: var(--porsche-black); color: white; padding: 15px 20px; cursor: pointer; font-weight: bold; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
+        .faq-container { max-width: 900px; margin: 0 auto; }
+        .faq-item { background: var(--porsche-surface); margin-bottom: 15px; border-radius: 6px; overflow: hidden; border: 1px solid #222; }
+        .faq-question { background: var(--porsche-card); color: white; padding: 18px 22px; cursor: pointer; font-weight: bold; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; font-size: 15px; }
         .faq-question:hover { color: var(--porsche-orange); }
-        .faq-answer { padding: 15px 20px; background: #fff; color: #444; font-size: 14px; line-height: 1.6; display: none; border-top: 1px solid #eee; }
-        .faq-item.active .faq-answer { display: block; }
+        .faq-answer { padding: 18px 22px; background: var(--porsche-surface); color: #bbb; font-size: 14px; line-height: 1.7; display: none; border-top: 1px solid #222; }
+        .faq-item.active .faq-answer { display: block; animation: fadeIn 0.3s ease; }
 
-        #page-login, #page-register, #page-booking, #page-admin { background-color: var(--porsche-dark-gray); color: white; }
-        .form-section { display: flex; justify-content: center; align-items: center; padding: 60px 20px; }
-        .form-container { background: #252525; padding: 35px; border-radius: 4px; width: 100%; max-width: 520px; border-top: 4px solid var(--porsche-orange); }
-        .form-container.admin-container { max-width: 1050px; }
-        .form-container h3 { margin-bottom: 10px; text-align: center; color: white; }
-        .work-hours-note { text-align: center; color: #aaa; font-size: 12px; margin-bottom: 20px; }
-        .form-group { margin-bottom: 15px; text-align: right; }
-        .form-group label { display: block; margin-bottom: 6px; font-size: 13px; color: #bbb; }
+        #page-login, #page-register, #page-booking, #page-admin { background-color: var(--porsche-black); }
+        .form-section { display: flex; justify-content: center; align-items: center; padding: 50px 20px; }
+        .form-container { background: var(--porsche-surface); padding: 40px; border-radius: 8px; width: 100%; max-width: 550px; border-top: 5px solid var(--porsche-orange); border: 1px solid #222; box-shadow: 0 15px 40px rgba(0,0,0,0.6); }
+        .form-container.admin-container { max-width: 1150px; }
+        .form-container h3 { margin-bottom: 8px; text-align: center; color: white; font-size: 24px; font-weight: 800; }
+        .work-hours-note { text-align: center; color: #aaa; font-size: 13px; margin-bottom: 25px; }
+        .form-group { margin-bottom: 18px; text-align: right; }
+        .form-group label { display: block; margin-bottom: 8px; font-size: 13px; color: #ccc; font-weight: 600; }
         
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 11px; background: #111; border: 1px solid #444; color: white; border-radius: 3px; font-size: 14px; }
-        .form-group textarea { resize: vertical; min-height: 70px; font-family: inherit; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 13px; background: #111; border: 1px solid #333; color: white; border-radius: 6px; font-size: 14px; transition: 0.3s; }
+        .form-group textarea { resize: vertical; min-height: 80px; font-family: inherit; }
         .form-group input[type="date"] { direction: ltr; text-align: left; }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--porsche-orange); outline: none; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--porsche-orange); outline: none; box-shadow: 0 0 10px var(--porsche-orange-glow); }
 
         .dynamic-field { display: none; }
 
         .admin-stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 15px;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
         .admin-stat-card {
-            background: #181818;
-            border: 1px solid #333;
-            border-top: 3px solid var(--porsche-orange);
-            padding: 15px;
-            border-radius: 4px;
+            background: #111;
+            border: 1px solid #262626;
+            border-top: 4px solid var(--porsche-orange);
+            padding: 20px;
+            border-radius: 6px;
             text-align: center;
         }
-        .admin-stat-card h4 { font-size: 24px; color: white; margin-bottom: 5px; }
-        .admin-stat-card p { font-size: 12px; color: #aaa; }
+        .admin-stat-card h4 { font-size: 28px; color: white; margin-bottom: 5px; font-weight: 900; }
+        .admin-stat-card p { font-size: 13px; color: #aaa; font-weight: 500; }
 
         .ticket-box {
-            background: #ffffff;
-            color: #000;
+            background: var(--porsche-card);
+            color: white;
             border-radius: 8px;
-            padding: 20px;
-            margin-top: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            padding: 24px;
+            margin-top: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             display: none;
+            border: 1px solid #333;
         }
 
-        .status-pending { border-right: 6px solid #ff5500; background: #ffffff; }
-        .status-accepted { border-right: 6px solid #2e7d32; background: #e8f5e9 !important; }
-        .status-rejected { border-right: 6px solid #c62828; background: #ffebee !important; }
+        .status-pending { border-right: 6px solid var(--porsche-orange); background: #1a1512; }
+        .status-accepted { border-right: 6px solid #2e7d32; background: #111c14 !important; }
+        .status-rejected { border-right: 6px solid #c62828; background: #201313 !important; }
 
-        .ticket-box h4 { margin-bottom: 12px; font-size: 17px; border-bottom: 1px solid #ddd; padding-bottom: 6px; color: #333; }
-        .ticket-item { margin-bottom: 8px; font-size: 14px; }
-        .ticket-item strong { color: #333; }
+        .ticket-box h4 { margin-bottom: 15px; font-size: 18px; border-bottom: 1px solid #333; padding-bottom: 8px; color: white; font-weight: 700; }
+        .ticket-item { margin-bottom: 10px; font-size: 14px; color: #ccc; }
+        .ticket-item strong { color: white; }
 
-        .badge-status { padding: 3px 8px; border-radius: 20px; font-weight: bold; font-size: 12px; display: inline-block; }
-        .badge-pending { background: #ffe0b2; color: #e65100; }
-        .badge-accepted { background: #c8e6c9; color: #1b5e20; }
-        .badge-rejected { background: #ffcdd2; color: #b71c1c; }
+        .badge-status { padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 12px; display: inline-block; }
+        .badge-pending { background: rgba(255, 152, 0, 0.2); color: #ffb74d; border: 1px solid rgba(255, 152, 0, 0.4); }
+        .badge-accepted { background: rgba(46, 125, 50, 0.2); color: #81c784; border: 1px solid rgba(46, 125, 50, 0.4); }
+        .badge-rejected { background: rgba(198, 40, 40, 0.2); color: #e57373; border: 1px solid rgba(198, 40, 40, 0.4); }
 
         .invoice-block {
-            margin-top: 12px;
-            background: rgba(0,0,0,0.03);
-            padding: 10px;
-            border-radius: 4px;
-            border: 1px dashed #ccc;
-            font-size: 12px;
+            margin-top: 15px;
+            background: rgba(0,0,0,0.3);
+            padding: 14px;
+            border-radius: 6px;
+            border: 1px dashed #444;
+            font-size: 13px;
         }
-        .invoice-title { font-weight: bold; color: #0d0d0d; border-bottom: 1px dashed #aaa; padding-bottom: 4px; margin-bottom: 6px; display: flex; justify-content: space-between; }
+        .invoice-title { font-weight: bold; color: white; border-bottom: 1px dashed #444; padding-bottom: 6px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
 
         .btn {
-            background-color: var(--porsche-orange); color: white; padding: 11px 20px; border: none; cursor: pointer;
-            width: 100%; font-size: 15px; font-weight: bold; transition: 0.3s; text-decoration: none; display: inline-block; text-align: center; border-radius: 4px;
+            background-color: var(--porsche-orange); color: white; padding: 13px 24px; border: none; cursor: pointer;
+            width: 100%; font-size: 15px; font-weight: bold; transition: 0.3s; text-decoration: none; display: inline-block; text-align: center; border-radius: 6px;
+            box-shadow: 0 4px 15px var(--porsche-orange-glow);
         }
-        .btn:hover { background-color: #cc4400; }
+        .btn:hover { background-color: #e04a00; box-shadow: 0 6px 20px rgba(255,85,0,0.6); transform: translateY(-2px); }
         
-        .btn-approve { background-color: #2e7d32; color: white; }
-        .btn-reject { background-color: #c62828; color: white; }
+        .btn-approve { background-color: #2e7d32; box-shadow: 0 4px 15px rgba(46,125,50,0.4); }
+        .btn-approve:hover { background-color: #1b5e20; }
+        
+        .btn-reject { background-color: #c62828; box-shadow: 0 4px 15px rgba(198,40,40,0.4); }
+        .btn-reject:hover { background-color: #b71c1c; }
 
-        .form-redirect { text-align: center; margin-top: 15px; color: #888; font-size: 12px; }
+        .form-redirect { text-align: center; margin-top: 18px; color: #888; font-size: 13px; }
         .form-redirect a { color: var(--porsche-orange); cursor: pointer; text-decoration: none; font-weight: bold; }
+        .form-redirect a:hover { text-decoration: underline; }
 
         .emergency-float {
             position: fixed;
-            bottom: 25px;
-            right: 25px;
+            bottom: 30px;
+            right: 30px;
             background-color: #c62828;
             color: white;
-            padding: 12px 18px;
+            padding: 14px 22px;
             border-radius: 50px;
-            box-shadow: 0 4px 15px rgba(198,40,40,0.4);
+            box-shadow: 0 6px 20px rgba(198,40,40,0.5);
             z-index: 998;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             text-decoration: none;
             font-weight: bold;
-            font-size: 13px;
+            font-size: 14px;
             transition: 0.3s;
+            border: 1px solid rgba(255,255,255,0.2);
         }
-        .emergency-float:hover { background-color: #b71c1c; transform: scale(1.05); }
+        .emergency-float:hover { background-color: #b71c1c; transform: scale(1.06); box-shadow: 0 8px 25px rgba(198,40,40,0.7); }
 
-        footer { background: var(--porsche-black); color: var(--text-light); padding: 40px 20px 20px; border-top: 3px solid var(--porsche-orange); }
-        .footer-content { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px; }
-        .footer-info h4 { font-size: 20px; color: white; margin-bottom: 8px; }
-        .footer-info p { color: #ccc; font-size: 15px; max-width: 600px; line-height: 1.6; }
-        .footer-location { color: var(--porsche-orange) !important; font-weight: bold; font-size: 17px !important; margin-top: 5px; }
+        footer { background: var(--porsche-surface); color: var(--text-light); padding: 50px 20px 25px; border-top: 3px solid var(--porsche-orange); }
+        .footer-content { max-width: 1280px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 25px; }
+        .footer-info h4 { font-size: 22px; color: white; margin-bottom: 10px; font-weight: 800; }
+        .footer-info p { color: #aaa; font-size: 15px; max-width: 650px; line-height: 1.6; }
+        .footer-location { color: var(--porsche-orange) !important; font-weight: bold; font-size: 17px !important; margin-top: 8px; }
 
-        .footer-social { display: flex; gap: 12px; margin-top: 10px; flex-wrap: wrap; justify-content: center; }
-        .social-btn { padding: 9px 18px; border-radius: 4px; text-decoration: none; color: white; font-weight: bold; font-size: 13px; transition: transform 0.2s; }
-        .social-btn:hover { transform: scale(1.05); }
+        .footer-social { display: flex; gap: 15px; margin-top: 10px; flex-wrap: wrap; justify-content: center; }
+        .social-btn { padding: 10px 20px; border-radius: 6px; text-decoration: none; color: white; font-weight: bold; font-size: 14px; transition: transform 0.2s, box-shadow 0.2s; }
+        .social-btn:hover { transform: scale(1.06); }
         
         .tiktok-btn { background: linear-gradient(45deg, #010101, #ee1d52, #69c9d0); }
         .instagram-btn { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
         .phone-btn { background-color: #25D366; }
         
-        .copyright { margin-top: 25px; font-size: 12px; color: #666; border-top: 1px solid #222; padding-top: 15px; width: 100%; }
+        .copyright { margin-top: 30px; font-size: 13px; color: #666; border-top: 1px solid #222; padding-top: 20px; width: 100%; font-weight: 500; }
 
         @media (max-width: 992px) {
-            .nav-container { flex-direction: column; gap: 12px; }
-            nav ul { flex-wrap: wrap; justify-content: center; gap: 10px; }
-            .hero h1 { font-size: 28px; }
-            .hero p { font-size: 14px; }
+            .nav-container { flex-direction: column; gap: 15px; }
+            nav ul { flex-wrap: wrap; justify-content: center; gap: 12px; }
+            .hero h1 { font-size: 32px; }
+            .hero p { font-size: 15px; }
             .logo { font-size: 22px; }
         }
     </style>
 
     <script>
-        // رابط السحابة الخاص بك (Google Apps Script Web App URL)
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwqLi35uzWICr7Ovi9E1j-YJF-1J50E_k53cO3B4PnZ73aSHcwq2GiRQNj-EzCjFc8w/exec";
 
         const porscheImages = [
@@ -471,10 +488,10 @@
         function startHeroSlider() {
             const heroElement = document.getElementById('hero-slider');
             if(heroElement) {
-                heroElement.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('${porscheImages[currentImageIndex]}')`;
+                heroElement.style.backgroundImage = `linear-gradient(rgba(10,10,10,0.7), rgba(10,10,10,0.85)), url('${porscheImages[currentImageIndex]}')`;
                 setInterval(() => {
                     currentImageIndex = (currentImageIndex + 1) % porscheImages.length;
-                    heroElement.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('${porscheImages[currentImageIndex]}')`;
+                    heroElement.style.backgroundImage = `linear-gradient(rgba(10,10,10,0.7), rgba(10,10,10,0.85)), url('${porscheImages[currentImageIndex]}')`;
                 }, 7000);
             }
         }
@@ -543,7 +560,6 @@
             }
         }
 
-        // إرسال الحجز للسحابة (Google Sheets)
         async function saveBookingToCloud(bookingData) {
             try {
                 await fetch(WEB_APP_URL, {
@@ -559,7 +575,6 @@
             }
         }
 
-        // جلب الحجوزات من السحابة
         async function getBookingsFromCloud() {
             try {
                 const response = await fetch(WEB_APP_URL);
@@ -570,6 +585,44 @@
                 return [];
             }
         }
+
+        async function checkClientBookingStatus() {
+            const currentInvId = document.getElementById('invId');
+            if (!currentInvId || currentInvId.innerText === "0000") return;
+
+            let targetId = currentInvId.innerText;
+            let cloudBookings = await getBookingsFromCloud();
+            
+            if (cloudBookings && cloudBookings.length > 0) {
+                let found = cloudBookings.find(b => String(b.bookingNumber || b.id) === String(targetId));
+                if (found) {
+                    let serverStatus = found.status || 'قيد الانتظار';
+                    let serverPrice = found.price || 'يحدد من الإدارة';
+                    let serverReason = found.reason || '';
+
+                    const ticketBox = document.getElementById('appointmentTicket');
+                    const liveBadge = document.getElementById('liveStatusBadge');
+                    const mainTitle = document.getElementById('ticketHeaderTitle');
+                    const invPrice = document.getElementById('invPrice');
+
+                    if (serverStatus === 'مقبول' || serverStatus === 'تم قبول الطلب') {
+                        ticketBox.className = "ticket-box status-accepted";
+                        liveBadge.className = "badge-status badge-accepted";
+                        liveBadge.innerText = "مقبول";
+                        mainTitle.innerText = "✅ حالة الطلب: تم قبول الموعد بنجاح";
+                        invPrice.innerText = serverPrice;
+                    } else if (serverStatus === 'مرفوض' || serverStatus === 'تم رفض الطلب') {
+                        ticketBox.className = "ticket-box status-rejected";
+                        liveBadge.className = "badge-status badge-rejected";
+                        liveBadge.innerText = "مرفوض";
+                        mainTitle.innerText = "❌ حالة الطلب: تم رفض الموعد" + (serverReason ? ` (${serverReason})` : "");
+                        invPrice.innerText = serverPrice;
+                    }
+                }
+            }
+        }
+
+        setInterval(checkClientBookingStatus, 5000);
 
         window.handleNewBooking = async function(event) {
             event.preventDefault();
@@ -669,7 +722,6 @@
             
             const mainTitle = document.getElementById('ticketHeaderTitle');
             mainTitle.innerText = "⏳ حالة الطلب: قيد الانتظار للمراجعة";
-            mainTitle.style.color = "#333"; 
 
             showToast('تم إرسال طلب الحجز بنجاح وحفظه سحابياً!');
 
@@ -697,7 +749,7 @@
             const tableBody = document.getElementById('bookingsTableBody');
             if(!tableBody) return;
 
-            tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#aaa;">جاري تحميل البيانات من السحابة...</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:25px; color:#aaa;">جاري تحميل البيانات من السحابة...</td></tr>';
 
             let allGlobalBookings = await getBookingsFromCloud();
             tableBody.innerHTML = '';
@@ -713,7 +765,7 @@
             document.getElementById('statRejected').innerText = rejectedCount;
 
             if (totalCount === 0) {
-                tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#aaa;">لا توجد طلبات حجز واردة حالياً</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:25px; color:#aaa;">لا توجد طلبات حجز واردة حالياً</td></tr>';
                 return;
             }
 
@@ -735,32 +787,32 @@
                 let reasonDisplay = bReason ? `<div style="color:#ff6b6b; font-size:11px; margin-top:4px;">السبب: ${bReason}</div>` : '';
 
                 const row = document.createElement('tr');
-                row.style.borderBottom = '1px solid #333';
+                row.style.borderBottom = '1px solid #262626';
                 row.innerHTML = `
-                    <td style="padding: 12px; border: 1px solid #444; font-weight:bold;">#${bId}</td>
-                    <td style="padding: 12px; border: 1px solid #444;">
+                    <td style="padding: 14px; border: 1px solid #262626; font-weight:bold; color:var(--porsche-orange);">#${bId}</td>
+                    <td style="padding: 14px; border: 1px solid #262626;">
                         <strong>${bName}</strong><br>
                         <small style="color: #aaa; direction:ltr; display:inline-block;">📞 ${bPhone}</small><br>
                         <small style="color: var(--porsche-orange);">${bCar}</small>
                     </td>
-                    <td style="padding: 12px; border: 1px solid #444;">
+                    <td style="padding: 14px; border: 1px solid #262626;">
                         ${bService}<br>
-                        <small style="color: #ccc;">📅 ${bDate}</small><br>
-                        <small style="color: #4db6ac;">💰 ${bPrice}</small>
+                        <small style="color: #bbb;">📅 ${bDate}</small><br>
+                        <small style="color: #81c784;">💰 ${bPrice}</small>
                     </td>
-                    <td style="padding: 12px; border: 1px solid #444;">
+                    <td style="padding: 14px; border: 1px solid #262626;">
                         <span class="badge-status ${badgeClass}" id="adminBadge_${bId}">${statusText}</span>
                         ${reasonDisplay}
                     </td>
-                    <td style="padding: 12px; border: 1px solid #444; text-align: center;">
-                        <div style="margin-bottom: 6px;">
-                            <input type="text" id="priceInput_${index}" placeholder="السعر (ر.س)" style="padding:4px; width:90px; background:#222; color:white; border:1px solid #555; font-size:12px; border-radius:3px;" value="${bPrice !== 'يحدد لاحقاً' ? bPrice : ''}">
+                    <td style="padding: 14px; border: 1px solid #262626; text-align: center;">
+                        <div style="margin-bottom: 8px;">
+                            <input type="text" id="priceInput_${index}" placeholder="السعر (ر.س)" style="padding:6px; width:100px; background:#111; color:white; border:1px solid #444; font-size:12px; border-radius:4px;" value="${bPrice !== 'يحدد لاحقاً' ? bPrice : ''}">
                         </div>
-                        <div style="margin-bottom: 6px;">
-                            <input type="text" id="reasonInput_${index}" placeholder="سبب الرفض" style="padding:4px; width:130px; background:#222; color:white; border:1px solid #555; font-size:12px; border-radius:3px;" value="${bReason}">
+                        <div style="margin-bottom: 8px;">
+                            <input type="text" id="reasonInput_${index}" placeholder="سبب الرفض" style="padding:6px; width:140px; background:#111; color:white; border:1px solid #444; font-size:12px; border-radius:4px;" value="${bReason}">
                         </div>
-                        <button class="btn btn-approve" style="padding: 5px 10px; font-size:12px; margin-bottom:4px; width:auto;" onclick="adminUpdateBookingStatus('${bId}', ${index}, 'مقبول')">✅ قبول</button>
-                        <button class="btn btn-reject" style="padding: 5px 10px; font-size:12px; width:auto;" onclick="adminUpdateBookingStatus('${bId}', ${index}, 'مرفوض')">❌ رفض</button>
+                        <button class="btn btn-approve" style="padding: 6px 12px; font-size:12px; margin-bottom:4px; width:auto;" onclick="adminUpdateBookingStatus('${bId}', ${index}, 'مقبول')">✅ قبول</button>
+                        <button class="btn btn-reject" style="padding: 6px 12px; font-size:12px; width:auto;" onclick="adminUpdateBookingStatus('${bId}', ${index}, 'مرفوض')">❌ رفض</button>
                     </td>
                 `;
                 tableBody.appendChild(row);
@@ -790,53 +842,6 @@
                     })
                 });
 
-                // تحديث السجل المحلي للمستخدم إذا كان الحجز خاص به
-                for (let i = 0; i < localStorage.length; i++) {
-                    let key = localStorage.key(i);
-                    if (key.includes('@')) {
-                        let userData = JSON.parse(localStorage.getItem(key));
-                        if (userData && userData.invoices) {
-                            let updated = false;
-                            userData.invoices.forEach(inv => {
-                                if (String(inv.id) === String(bookingId)) {
-                                    inv.status = newStatus;
-                                    inv.price = finalPrice;
-                                    inv.reason = finalReason;
-                                    updated = true;
-                                }
-                            });
-                            if (updated) {
-                                localStorage.setItem(key, JSON.stringify(userData));
-                                if (key === localStorage.getItem('activeSessionUser')) {
-                                    updateInvoiceHistoryDOM(userData.invoices);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // تحديث واجهة تذكرة الحجز المفتوحة حالياً إذا تطابق رقم الحجز
-                const currentTicketInvId = document.getElementById('invId');
-                if (currentTicketInvId && String(currentTicketInvId.innerText) === String(bookingId)) {
-                    const ticketBox = document.getElementById('appointmentTicket');
-                    const liveBadge = document.getElementById('liveStatusBadge');
-                    const mainTitle = document.getElementById('ticketHeaderTitle');
-                    const invPrice = document.getElementById('invPrice');
-
-                    if (newStatus === 'مقبول') {
-                        ticketBox.className = "ticket-box status-accepted";
-                        liveBadge.className = "badge-status badge-accepted";
-                        liveBadge.innerText = "مقبول";
-                        mainTitle.innerText = "✅ حالة الطلب: تم قبول الموعد بنجاح";
-                    } else {
-                        ticketBox.className = "ticket-box status-rejected";
-                        liveBadge.className = "badge-status badge-rejected";
-                        liveBadge.innerText = "مرفوض";
-                        mainTitle.innerText = "❌ حالة الطلب: تم رفض الموعد";
-                    }
-                    invPrice.innerText = finalPrice;
-                }
-
                 showToast(`تم تحديث حالة الطلب #${bookingId} إلى (${newStatus}) بنجاح!`);
                 setTimeout(() => { loadAdminBookings(); }, 1200);
 
@@ -850,7 +855,7 @@
             const container = document.getElementById('invoiceHistoryContainer');
             if(!container) return;
             if (!invoices || invoices.length === 0) {
-                container.innerHTML = '<span style="font-size: 11px; color:#777;">لا يوجد حجوزات سابقة.</span>';
+                container.innerHTML = '<span style="font-size: 12px; color:#777;">لا يوجد حجوزات سابقة.</span>';
                 return;
             }
 
@@ -858,16 +863,16 @@
             invoices.forEach(inv => {
                 const item = document.createElement('div');
                 item.className = 'invoice-item';
-                let statusColor = "#ff9800";
+                let statusColor = "#ffb74d";
                 let statusText = inv.status || 'قيد الانتظار';
-                if(statusText === "مقبول" || statusText === "تم قبول الطلب") statusColor = "#4caf50";
-                if(statusText === "مرفوض" || statusText === "تم رفض الطلب") statusColor = "#f44336";
+                if(statusText === "مقبول" || statusText === "تم قبول الطلب") statusColor = "#81c784";
+                if(statusText === "مرفوض" || statusText === "تم رفض الطلب") statusColor = "#e57373";
 
                 let reasonSub = inv.reason ? `<div style="color:#ff6b6b;">السبب: ${inv.reason}</div>` : '';
 
                 item.innerHTML = `
-                    <div><strong>رقم الحجز #${inv.id}</strong> - ${inv.price} <span style="color:${statusColor}; font-size:10px; font-weight:bold;">(${statusText})</span></div>
-                    <div style="color:#aaa;">الخدمة: ${inv.service}</div>
+                    <div><strong>رقم الحجز #${inv.id}</strong> - <span style="color:var(--porsche-orange);">${inv.price}</span> <span style="color:${statusColor}; font-size:11px; font-weight:bold;">(${statusText})</span></div>
+                    <div style="color:#bbb;">الخدمة: ${inv.service}</div>
                     <div style="color:#888; direction: ltr; text-align: right;">التاريخ: ${inv.date}</div>
                     ${reasonSub}
                 `;
@@ -942,7 +947,7 @@
 
     <header>
         <div class="nav-container">
-            <div class="logo" onclick="navigateTo('home')">ADAM <span style="color: var(--porsche-orange);">AUTO</span> SERVES</div>
+            <div class="logo" onclick="navigateTo('home')">ADAM <span>AUTO</span> SERVES</div>
             <nav>
                 <ul>
                     <li><a id="nav-home" class="active" onclick="navigateTo('home')">الرئيسية</a></li>
@@ -952,7 +957,7 @@
                     <li><a id="nav-booking" onclick="navigateTo('booking')">حجز موعد</a></li>
                     <li id="menu-login"><a id="nav-login" onclick="navigateTo('login')">تسجيل الدخول</a></li>
                     <li id="menu-register"><a id="nav-register" onclick="navigateTo('register')">حساب جديد</a></li>
-                    <li><a id="nav-admin" onclick="checkAdminPassword()" style="color:#2e7d32; font-weight:bold; cursor:pointer;">🔐 لوحة الإدارة</a></li>
+                    <li><a id="nav-admin" onclick="checkAdminPassword()" style="color:#81c784; font-weight:bold; cursor:pointer;">🔐 لوحة الإدارة</a></li>
                 </ul>
 
                 <div class="user-profile-container" id="userProfileArea">
@@ -966,7 +971,7 @@
                         <div class="history-section">
                             <h6>🧾 سجل الصيانة وحجوزاتك:</h6>
                             <div id="invoiceHistoryContainer">
-                                <span style="font-size: 11px; color:#777;">لا يوجد حجوزات سابقة.</span>
+                                <span style="font-size: 12px; color:#777;">لا يوجد حجوزات سابقة.</span>
                             </div>
                         </div>
 
@@ -1003,7 +1008,7 @@
             <div class="about-grid">
                 <div class="about-box">
                     <h3>⚙️ معلومات عن الورشة</h3>
-                    <p style="color: #444; line-height: 1.8; font-size: 15px;">
+                    <p style="color: #bbb; line-height: 1.8; font-size: 15px;">
                         يعتبر مركز <strong>آدم أوتو سيرفس</strong> صرحاً متكاملاً مخصصاً لصيانة وبرمجة وفحص سيارات بورش بكافة طرازاتها وفئاتها بالخبر.
                     </p>
                 </div>
@@ -1173,7 +1178,7 @@
                     <div class="ticket-item"><strong>رقم هاتف العميل:</strong> <span id="tickPhone">---</span></div>
                     <div class="ticket-item"><strong>طراز السيارة:</strong> <span id="tickModel">---</span></div>
                     <div class="ticket-item"><strong>نوع الخدمة:</strong> <span id="tickService">---</span></div>
-                    <div class="ticket-item" id="tickDynamicSpecs" style="background: #fdfdfd; padding: 6px; border-radius: 4px; display:none; font-size: 13px; border: 1px solid #eee;"></div>
+                    <div class="ticket-item" id="tickDynamicSpecs" style="background: rgba(0,0,0,0.2); padding: 8px; border-radius: 4px; display:none; font-size: 13px; border: 1px solid #333;"></div>
                     <div class="ticket-item"><strong>تاريخ ووقت الحجز:</strong> <span id="tickDateTime">---</span></div>
                     
                     <div class="invoice-block">
@@ -1181,7 +1186,7 @@
                             <span>🧾 رقم الحجز: #<span id="invId">0000</span></span>
                             <span id="liveStatusBadge" class="badge-status badge-pending">قيد الانتظار للمراجعة</span>
                         </div>
-                        <div class="ticket-item" style="font-size:12px; margin-top:8px;"><strong>السعر النهائي:</strong> <span id="invPrice" style="font-weight:bold; color:var(--porsche-orange);">يحدد لاحقاً من الإدارة</span></div>
+                        <div class="ticket-item" style="font-size:13px; margin-top:8px;"><strong>السعر النهائي:</strong> <span id="invPrice" style="font-weight:bold; color:var(--porsche-orange);">يحدد لاحقاً من الإدارة</span></div>
                     </div>
                 </div>
             </div>
@@ -1226,20 +1231,20 @@
                 
                 <div class="admin-stats-grid">
                     <div class="admin-stat-card"><h4 id="statTotal">0</h4><p>إجمالي الطلبات</p></div>
-                    <div class="admin-stat-card" style="border-top-color: #2e7d32;"><h4 id="statAccepted" style="color: #4caf50;">0</h4><p>الحجوزات المقبولة</p></div>
+                    <div class="admin-stat-card" style="border-top-color: #2e7d32;"><h4 id="statAccepted" style="color: #81c784;">0</h4><p>الحجوزات المقبولة</p></div>
                     <div class="admin-stat-card" style="border-top-color: #ff9800;"><h4 id="statPending" style="color: #ffb74d;">0</h4><p>قيد الانتظار</p></div>
-                    <div class="admin-stat-card" style="border-top-color: #f44336;"><h4 id="statRejected" style="color: #ef5350;">0</h4><p>الطلبات المرفوضة</p></div>
+                    <div class="admin-stat-card" style="border-top-color: #f44336;"><h4 id="statRejected" style="color: #e57373;">0</h4><p>الطلبات المرفوضة</p></div>
                 </div>
 
                 <div class="table-responsive" style="overflow-x: auto; margin-bottom: 25px;">
                     <table class="table table-bordered align-middle" style="width: 100%; border-collapse: collapse; text-align: right; background: #111; color: white;">
                         <thead>
-                            <tr style="background: #0d0d0d; color: var(--porsche-orange); border-bottom: 2px solid var(--porsche-orange);">
-                                <th style="padding: 12px; border: 1px solid #444;">الرقم التعريفي</th>
-                                <th style="padding: 12px; border: 1px solid #444;">العميل والسيارة</th>
-                                <th style="padding: 12px; border: 1px solid #444;">الخدمة والموعد</th>
-                                <th style="padding: 12px; border: 1px solid #444;">الحالة</th>
-                                <th style="padding: 12px; border: 1px solid #444;">الإجراءات المباشرة</th>
+                            <tr style="background: #0a0a0a; color: var(--porsche-orange); border-bottom: 2px solid var(--porsche-orange);">
+                                <th style="padding: 14px; border: 1px solid #262626;">الرقم التعريفي</th>
+                                <th style="padding: 14px; border: 1px solid #262626;">العميل والسيارة</th>
+                                <th style="padding: 14px; border: 1px solid #262626;">الخدمة والموعد</th>
+                                <th style="padding: 14px; border: 1px solid #262626;">الحالة</th>
+                                <th style="padding: 14px; border: 1px solid #262626; text-align: center;">الإجراءات المباشرة</th>
                             </tr>
                         </thead>
                         <tbody id="bookingsTableBody">
@@ -1256,7 +1261,7 @@
                 <h4>مركز آدم لخدمات السيارات الفاخرة</h4>
                 <p>قطع غيار وفحص وصيانة وبرمجة جميع سيارات بورش باحترافية عالية بالخبر</p>
                 <p class="footer-location">📍 المنطقة الشرقية - الخبر</p>
-            </div>
+           </div>
             <div class="footer-social">
                 <a href="https://www.tiktok.com/@adamautoservices" target="_blank" class="social-btn tiktok-btn">📱 تيك توك</a>
                 <a href="https://www.instagram.com/adamautoservise" target="_blank" class="social-btn instagram-btn">📸 إنستغرام</a>
