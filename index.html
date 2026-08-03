@@ -65,6 +65,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            direction: ltr; /* ضمان ترتيب الشعار بالإنجليزية بشكل صحيح */
         }
         .logo span { color: var(--porsche-orange); text-shadow: 0 0 10px var(--porsche-orange-glow); }
 
@@ -586,52 +587,41 @@
             }
         }
 
-// دالة محدثة لجلب سجل الحجوزات الخاص بالعميل من السحابة مباشرة بناءً على رقم جواله أو بريده
-async function loadClientHistoryFromCloud(clientPhone) {
-    const container = document.getElementById('invoiceHistoryContainer');
-    if(!container) return;
-    
-    container.innerHTML = '<span style="font-size: 12px; color:#aaa;">جاري تحديث السجل من السحابة...</span>';
+        async function checkClientBookingStatus() {
+            const currentInvId = document.getElementById('invId');
+            if (!currentInvId || currentInvId.innerText === "0000") return;
 
-    let allBookings = await getBookingsFromCloud();
-    if (!allBookings || allBookings.length === 0) {
-        container.innerHTML = '<span style="font-size: 12px; color:#777;">لا يوجد حجوزات سابقة.</span>';
-        return;
-    }
+            let targetId = currentInvId.innerText;
+            let cloudBookings = await getBookingsFromCloud();
+            
+            if (cloudBookings && cloudBookings.length > 0) {
+                let found = cloudBookings.find(b => String(b.bookingNumber || b.id) === String(targetId));
+                if (found) {
+                    let serverStatus = found.status || 'قيد الانتظار';
+                    let serverPrice = found.price || 'يحدد من الإدارة';
+                    let serverReason = found.reason || '';
 
-    // تصفية الحجوزات الخاصة بهذا العميل فقط بناءً على رقم الجوال المسجل في الجلسة
-    let clientBookings = allBookings.filter(b => String(b.phone || b.clientPhone) === String(clientPhone));
+                    const ticketBox = document.getElementById('appointmentTicket');
+                    const liveBadge = document.getElementById('liveStatusBadge');
+                    const mainTitle = document.getElementById('ticketHeaderTitle');
+                    const invPrice = document.getElementById('invPrice');
 
-    if (clientBookings.length === 0) {
-        container.innerHTML = '<span style="font-size: 12px; color:#777;">لا يوجد حجوزات سابقة.</span>';
-        return;
-    }
-
-    container.innerHTML = '';
-    clientBookings.forEach(inv => {
-        const item = document.createElement('div');
-        item.className = 'invoice-item';
-        
-        let statusColor = "#ffb74d";
-        let statusText = inv.status || 'قيد الانتظار';
-        if(statusText === "مقبول" || statusText === "تم قبول الطلب") statusColor = "#81c784";
-        if(statusText === "مرفوض" || statusText === "تم رفض الطلب") statusColor = "#e57373";
-
-        let reasonSub = inv.reason ? `<div style="color:#ff6b6b;">السبب: ${inv.reason}</div>` : '';
-        let bId = inv.bookingNumber || inv.id || '---';
-        let bPrice = inv.price || 'يحدد من الإدارة';
-        let bService = inv.service || 'صيانة';
-        let bDate = inv.date || '';
-
-        item.innerHTML = `
-            <div><strong>رقم الحجز #${bId}</strong> - <span style="color:var(--porsche-orange);">${bPrice}</span> <span style="color:${statusColor}; font-size:11px; font-weight:bold;">(${statusText})</span></div>
-            <div style="color:#bbb;">الخدمة: ${bService}</div>
-            <div style="color:#888; direction: ltr; text-align: right;">التاريخ: ${bDate}</div>
-            ${reasonSub}
-        `;
-        container.prepend(item);
-    });
-}
+                    if (serverStatus === 'مقبول' || serverStatus === 'تم قبول الطلب') {
+                        ticketBox.className = "ticket-box status-accepted";
+                        liveBadge.className = "badge-status badge-accepted";
+                        liveBadge.innerText = "مقبول";
+                        mainTitle.innerText = "✅ حالة الطلب: تم قبول الموعد بنجاح";
+                        invPrice.innerText = serverPrice;
+                    } else if (serverStatus === 'مرفوض' || serverStatus === 'تم رفض الطلب') {
+                        ticketBox.className = "ticket-box status-rejected";
+                        liveBadge.className = "badge-status badge-rejected";
+                        liveBadge.innerText = "مرفوض";
+                        mainTitle.innerText = "❌ حالة الطلب: تم رفض الموعد" + (serverReason ? ` (${serverReason})` : "");
+                        invPrice.innerText = serverPrice;
+                    }
+                }
+            }
+        }
 
         setInterval(checkClientBookingStatus, 5000);
 
@@ -830,66 +820,66 @@ async function loadClientHistoryFromCloud(clientPhone) {
             });
         }
 
-window.adminUpdateBookingStatus = async function(bookingId, index, newStatus) {
-    let priceInputVal = document.getElementById(`priceInput_${index}`).value.trim();
-    let reasonInputVal = document.getElementById(`reasonInput_${index}`).value.trim();
+        window.adminUpdateBookingStatus = async function(bookingId, index, newStatus) {
+            let priceInputVal = document.getElementById(`priceInput_${index}`).value.trim();
+            let reasonInputVal = document.getElementById(`reasonInput_${index}`).value.trim();
 
-    let finalPrice = newStatus === 'مقبول' ? (priceInputVal || "معتمد") : "يحدد من الإدارة";
-    let finalReason = newStatus === 'مرفوض' ? (reasonInputVal || "تم إلغاء الموعد") : "";
+            let finalPrice = newStatus === 'مقبول' ? (priceInputVal || "معتمد") : "يحدد من الإدارة";
+            let finalReason = newStatus === 'مرفوض' ? (reasonInputVal || "تم إلغاء الموعد") : "";
 
-    showToast(`جاري تحديث الحالة في السحابة وفي حساب العميل...`);
+            showToast(`جاري تحديث الحالة في السحابة وفي حساب العميل...`);
 
-    try {
-        await fetch(WEB_APP_URL, {
-            method: "POST",
-            mode: "no-cors",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                action: "updateStatus",
-                bookingNumber: bookingId,
-                status: newStatus,
-                price: finalPrice,
-                reason: finalReason
-            })
-        });
+            try {
+                await fetch(WEB_APP_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        action: "updateStatus",
+                        bookingNumber: bookingId,
+                        status: newStatus,
+                        price: finalPrice,
+                        reason: finalReason
+                    })
+                });
 
-        for (let i = 0; i < localStorage.length; i++) {
-            let key = localStorage.key(i);
-            if (key && key.includes('@')) {
-                let userData = JSON.parse(localStorage.getItem(key));
-                if (userData && userData.invoices) {
-                    let updated = false;
-                    userData.invoices.forEach(inv => {
-                        if (String(inv.id) === String(bookingId)) {
-                            inv.status = newStatus;
-                            inv.price = finalPrice;
-                            inv.reason = finalReason;
-                            updated = true;
+                for (let i = 0; i < localStorage.length; i++) {
+                    let key = localStorage.key(i);
+                    if (key && key.includes('@')) {
+                        let userData = JSON.parse(localStorage.getItem(key));
+                        if (userData && userData.invoices) {
+                            let updated = false;
+                            userData.invoices.forEach(inv => {
+                                if (String(inv.id) === String(bookingId)) {
+                                    inv.status = newStatus;
+                                    inv.price = finalPrice;
+                                    inv.reason = finalReason;
+                                    updated = true;
+                                }
+                            });
+                            if (updated) {
+                                localStorage.setItem(key, JSON.stringify(userData));
+                            }
                         }
-                    });
-                    if (updated) {
-                        localStorage.setItem(key, JSON.stringify(userData));
                     }
                 }
+
+                let sessionEmail = localStorage.getItem('activeSessionUser');
+                if (sessionEmail) {
+                    let currentUser = JSON.parse(localStorage.getItem(sessionEmail));
+                    if (currentUser && currentUser.invoices) {
+                        updateInvoiceHistoryDOM(currentUser.invoices);
+                    }
+                }
+
+                showToast(`تم تحديث حالة الطلب #${bookingId} إلى (${newStatus}) بنجاح!`);
+                setTimeout(() => { loadAdminBookings(); }, 1200);
+
+            } catch (error) {
+                console.error("خطأ في التحديث:", error);
+                showToast("❌ حدث خطأ أثناء التحديث.");
             }
         }
-
-        let sessionEmail = localStorage.getItem('activeSessionUser');
-        if (sessionEmail) {
-            let currentUser = JSON.parse(localStorage.getItem(sessionEmail)); // تم تصحيح الاسم هنا بدون مسافة
-            if (currentUser && currentUser.invoices) {
-                updateInvoiceHistoryDOM(currentUser.invoices);
-            }
-        }
-
-        showToast(`تم تحديث حالة الطلب #${bookingId} إلى (${newStatus}) بنجاح!`);
-        setTimeout(() => { loadAdminBookings(); }, 1200);
-
-    } catch (error) {
-        console.error("خطأ في التحديث:", error);
-        showToast("❌ حدث خطأ أثناء التحديث.");
-    }
-}
 
         function updateInvoiceHistoryDOM(invoices) {
             const container = document.getElementById('invoiceHistoryContainer');
@@ -987,7 +977,7 @@ window.adminUpdateBookingStatus = async function(bookingId, index, newStatus) {
 
     <header>
         <div class="nav-container">
-            <div class="logo" onclick="navigateTo('home')">ADAM <span>AUTO</span> SERVES</div>
+            <div class="logo" onclick="navigateTo('home')">ADAM <span>AUTO</span> SERVICE</div>
             <nav>
                 <ul>
                     <li><a id="nav-home" class="active" onclick="navigateTo('home')">الرئيسية</a></li>
@@ -1049,7 +1039,7 @@ window.adminUpdateBookingStatus = async function(bookingId, index, newStatus) {
                 <div class="about-box">
                     <h3>⚙️ معلومات عن الورشة</h3>
                     <p style="color: #bbb; line-height: 1.8; font-size: 15px;">
-                        يعتبر مركز <strong>آدم أوتو سيرفس</strong> صرحاً متكاملاً مخصصاً لصيانة وبرمجة وفحص سيارات بورش بكافة طرازاتها وفئاتها بالخبر.
+                        يعتبر مركز <strong>Adam Auto Service</strong> صرحاً متكاملاً مخصصاً لصيانة وبرمجة وفحص سيارات بورش بكافة طرازاتها وفئاتها بالخبر.
                     </p>
                 </div>
                 <div class="about-box">
@@ -1276,7 +1266,7 @@ window.adminUpdateBookingStatus = async function(bookingId, index, newStatus) {
                     <div class="admin-stat-card" style="border-top-color: #f44336;"><h4 id="statRejected" style="color: #e57373;">0</h4><p>الطلبات المرفوضة</p></div>
                 </div>
 
-                <div class="table-responsive" style="overflow-x: auto; margin-bottom: 25px;">
+            <div class="table-responsive" style="overflow-x: auto; margin-bottom: 25px;">
                     <table class="table table-bordered align-middle" style="width: 100%; border-collapse: collapse; text-align: right; background: #111; color: white;">
                         <thead>
                             <tr style="background: #0a0a0a; color: var(--porsche-orange); border-bottom: 2px solid var(--porsche-orange);">
@@ -1300,8 +1290,8 @@ window.adminUpdateBookingStatus = async function(bookingId, index, newStatus) {
             <div class="footer-info">
                 <h4>مركز آدم لخدمات السيارات الفاخرة</h4>
                 <p>قطع غيار وفحص وصيانة وبرمجة جميع سيارات بورش باحترافية عالية بالخبر</p>
-               <p class="footer-location">📍 المنطقة الشرقية - الخبر</p>
-           </div>
+                <p class="footer-location">📍 المنطقة الشرقية - الخبر</p>
+            </div>
             <div class="footer-social">
                 <a href="https://www.tiktok.com/@adamautoservices" target="_blank" class="social-btn tiktok-btn">📱 تيك توك</a>
                 <a href="https://www.instagram.com/adamautoservise" target="_blank" class="social-btn instagram-btn">📸 إنستغرام</a>
