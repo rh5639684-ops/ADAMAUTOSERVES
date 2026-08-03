@@ -806,7 +806,7 @@
                     </td>
                     <td style="padding: 14px; border: 1px solid #262626; text-align: center;">
                         <div style="margin-bottom: 8px;">
-                            <input type="text" id="priceInput_${index}" placeholder="السعر (ر.س)" style="padding:6px; width:100px; background:#111; color:white; border:1px solid #444; font-size:12px; border-radius:4px;" value="${bPrice !== 'يحدد لاحقاً' ? bPrice : ''}">
+                            <input type="text" id="priceInput_${index}" placeholder="السعر (ر.س)" style="padding:6px; width:100px; background:#111; color:white; border:1px solid #444; font-size:12px; border-radius:4px;" value="${bPrice !== 'يحدد لاحقاً' && bPrice !== 'يحدد من الإدارة' ? bPrice : ''}">
                         </div>
                         <div style="margin-bottom: 8px;">
                             <input type="text" id="reasonInput_${index}" placeholder="سبب الرفض" style="padding:6px; width:140px; background:#111; color:white; border:1px solid #444; font-size:12px; border-radius:4px;" value="${bReason}">
@@ -819,37 +819,66 @@
             });
         }
 
-        window.adminUpdateBookingStatus = async function(bookingId, index, newStatus) {
-            let priceInputVal = document.getElementById(`priceInput_${index}`).value.trim();
-            let reasonInputVal = document.getElementById(`reasonInput_${index}`).value.trim();
+window.adminUpdateBookingStatus = async function(bookingId, index, newStatus) {
+    let priceInputVal = document.getElementById(`priceInput_${index}`).value.trim();
+    let reasonInputVal = document.getElementById(`reasonInput_${index}`).value.trim();
 
-            let finalPrice = newStatus === 'مقبول' ? (priceInputVal || "معتمد") : "يحدد من الإدارة";
-            let finalReason = newStatus === 'مرفوض' ? (reasonInputVal || "تم إلغاء الموعد") : "";
+    let finalPrice = newStatus === 'مقبول' ? (priceInputVal || "معتمد") : "يحدد من الإدارة";
+    let finalReason = newStatus === 'مرفوض' ? (reasonInputVal || "تم إلغاء الموعد") : "";
 
-            showToast(`جاري تحديث الحالة في السحابة...`);
+    showToast(`جاري تحديث الحالة في السحابة وفي حساب العميل...`);
 
-            try {
-                await fetch(WEB_APP_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        action: "updateStatus",
-                        bookingNumber: bookingId,
-                        status: newStatus,
-                        price: finalPrice,
-                        reason: finalReason
-                    })
-                });
+    try {
+        await fetch(WEB_APP_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                action: "updateStatus",
+                bookingNumber: bookingId,
+                status: newStatus,
+                price: finalPrice,
+                reason: finalReason
+            })
+        });
 
-                showToast(`تم تحديث حالة الطلب #${bookingId} إلى (${newStatus}) بنجاح!`);
-                setTimeout(() => { loadAdminBookings(); }, 1200);
-
-            } catch (error) {
-                console.error("خطأ في التحديث:", error);
-                showToast("❌ حدث خطأ أثناء التحديث.");
+        for (let i = 0; i < localStorage.length; i++) {
+            let key = localStorage.key(i);
+            if (key && key.includes('@')) {
+                let userData = JSON.parse(localStorage.getItem(key));
+                if (userData && userData.invoices) {
+                    let updated = false;
+                    userData.invoices.forEach(inv => {
+                        if (String(inv.id) === String(bookingId)) {
+                            inv.status = newStatus;
+                            inv.price = finalPrice;
+                            inv.reason = finalReason;
+                            updated = true;
+                        }
+                    });
+                    if (updated) {
+                        localStorage.setItem(key, JSON.stringify(userData));
+                    }
+                }
             }
         }
+
+        let sessionEmail = localStorage.getItem('activeSessionUser');
+        if (sessionEmail) {
+            let currentUser = JSON.parse(localStorage.getItem(sessionEmail)); // تم تصحيح الاسم هنا بدون مسافة
+            if (currentUser && currentUser.invoices) {
+                updateInvoiceHistoryDOM(currentUser.invoices);
+            }
+        }
+
+        showToast(`تم تحديث حالة الطلب #${bookingId} إلى (${newStatus}) بنجاح!`);
+        setTimeout(() => { loadAdminBookings(); }, 1200);
+
+    } catch (error) {
+        console.error("خطأ في التحديث:", error);
+        showToast("❌ حدث خطأ أثناء التحديث.");
+    }
+}
 
         function updateInvoiceHistoryDOM(invoices) {
             const container = document.getElementById('invoiceHistoryContainer');
@@ -1260,7 +1289,7 @@
             <div class="footer-info">
                 <h4>مركز آدم لخدمات السيارات الفاخرة</h4>
                 <p>قطع غيار وفحص وصيانة وبرمجة جميع سيارات بورش باحترافية عالية بالخبر</p>
-                <p class="footer-location">📍 المنطقة الشرقية - الخبر</p>
+               <p class="footer-location">📍 المنطقة الشرقية - الخبر</p>
            </div>
             <div class="footer-social">
                 <a href="https://www.tiktok.com/@adamautoservices" target="_blank" class="social-btn tiktok-btn">📱 تيك توك</a>
