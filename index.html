@@ -653,13 +653,13 @@
         }
 
         async function checkClientBookingStatus() {
-            const currentInvId = document.getElementById('invId');
-            if (!currentInvId || currentInvId.innerText === "0000") return;
-
-            let targetId = currentInvId.innerText;
             let cloudBookings = await getBookingsFromCloud();
-            
-            if (cloudBookings && cloudBookings.length > 0) {
+            let sessionEmail = localStorage.getItem('activeSessionUser');
+
+            // تحديث كارت الحجز المعروض حالياً إذا وجد
+            const currentInvId = document.getElementById('invId');
+            if (currentInvId && currentInvId.innerText !== "0000" && cloudBookings && cloudBookings.length > 0) {
+                let targetId = currentInvId.innerText;
                 let found = cloudBookings.find(b => String(b.bookingNumber || b.id) === String(targetId));
                 if (found) {
                     let serverStatus = found.status || 'قيد الانتظار';
@@ -683,6 +683,32 @@
                         liveBadge.innerText = "مرفوض";
                         mainTitle.innerText = "❌ حالة الطلب: تم رفض الموعد" + (serverReason ? ` (${serverReason})` : "");
                         invPrice.innerText = serverPrice;
+                    }
+                }
+            }
+
+            // تحديث سجل الصيانة القائمة الجانبية للعميل تلقائياً ببيانات السحابة
+            if (sessionEmail && cloudBookings && cloudBookings.length > 0) {
+                let currentUser = JSON.parse(localStorage.getItem(sessionEmail));
+                if (currentUser) {
+                    let isUpdated = false;
+                    if(!currentUser.invoices) currentUser.invoices = [];
+
+                    currentUser.invoices.forEach(inv => {
+                        let matched = cloudBookings.find(b => String(b.bookingNumber || b.id) === String(inv.id));
+                        if (matched) {
+                            if (inv.status !== matched.status || inv.price !== matched.price || inv.reason !== matched.reason) {
+                                inv.status = matched.status;
+                                inv.price = matched.price;
+                                inv.reason = matched.reason;
+                                isUpdated = true;
+                            }
+                        }
+                    });
+
+                    if (isUpdated) {
+                        localStorage.setItem(sessionEmail, JSON.stringify(currentUser));
+                        updateInvoiceHistoryDOM(currentUser.invoices);
                     }
                 }
             }
@@ -1042,6 +1068,7 @@
                     })
                 });
 
+                // تحديث قاعدة البيانات المحلية لكافة المستخدمين في LocalStorage
                 for (let i = 0; i < localStorage.length; i++) {
                     let key = localStorage.key(i);
                     if (key && key.includes('@')) {
@@ -1063,6 +1090,7 @@
                     }
                 }
 
+                // تحديث القائمة الجانبية (سجل الصيانة وحجوزاتك) فوراً دون الحاجة لتحديث الصفحة
                 let sessionEmail = localStorage.getItem('activeSessionUser');
                 if (sessionEmail) {
                     let currentUser = JSON.parse(localStorage.getItem(sessionEmail));
@@ -1220,9 +1248,9 @@
 
         <div class="stats-bar">
             <div class="stats-grid">
-                <div class="stat-box"><h3>+1500</h3><p>سيارة بورش تم صيانتها وبرمجتها</p></div>
+                <div class="stat-box"><h3>+850</h3><p>سيارة بورش تم صيانتها وبرمجتها</p></div>
                 <div class="stat-box"><h3>100%</h3><p>قطع أصلية ومعايير مصنعية</p></div>
-                <div class="stat-box"><h3>+20</h3><p>عاماً من الخبرة التخصصية الفائقة</p></div>
+                <div class="stat-box"><h3>+12</h3><p>عاماً من الخبرة التخصصية الفائقة</p></div>
                 <div class="stat-box"><h3>24/7</h3><p>دعم طوارئ وسحب سريع بالخبر</p></div>
             </div>
         </div>
@@ -1278,7 +1306,7 @@
                 </div>
                 <div class="service-card">
                     <div><div class="service-icon">💻</div><h3>برمجة وفحص كمبيوتر</h3><p>تحديث الأنظمة، قراءة الأعطال بدقة، وبرمجة كاملة لجميع كمبيوترات بورش.</p></div>
-                    <button class="service-book-btn" onclick="quickBook('برمجة وفحص كمبيوتر متطور')">حجز موعد</button>
+<button class="service-book-btn" onclick="quickBook('برمجة وفحص كمبيوتر متطور')">حجز موعد</button>
                 </div>
             </div>
         </div>
