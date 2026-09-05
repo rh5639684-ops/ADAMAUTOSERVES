@@ -8,6 +8,10 @@
     <!-- مكتبة تحويل HTML إلى PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
+    <!-- مكتبة تحديد وتنسيق رمز الهاتف الدولي -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap');
 
@@ -286,6 +290,14 @@
         .form-group input[type="date"] { direction: ltr; text-align: left; }
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--porsche-orange); outline: none; box-shadow: 0 0 10px var(--porsche-orange-glow); }
 
+        /* تعديلات تنسيق مكتبة الهاتف الدولي للوضع الليلي */
+        .iti { width: 100%; direction: ltr; }
+        .iti__country-list { background-color: var(--porsche-surface); border: 1px solid #333; color: #fff; text-align: left; }
+        .iti__country { padding: 8px 10px; }
+        .iti__country:hover, .iti__country.iti__highlight { background-color: var(--porsche-card); color: var(--porsche-orange); }
+        .iti__selected-flag { background-color: #111; border-radius: 6px 0 0 6px; }
+        .iti input[type="tel"] { direction: ltr; text-align: left; }
+
         .dynamic-field { display: none; }
 
         /* أدوات البحث والفلترة لوحة الإدارة */
@@ -444,12 +456,42 @@
         let previousBookingCount = -1;
         let adminAutoRefreshInterval = null;
 
+        // متغيرات حفظ مثيلات إدخال الهواتف الدولية
+        let itiGuestPhone = null;
+        let itiRegPhone = null;
+
         window.onload = function() {
+            initInternationalPhoneInputs();
             checkUserSession();
             startHeroSlider();
             setupDatePickerMin();
             handleServiceFieldsChange();
         };
+
+        // تهيئة حقول الهاتف وتحديد رمز الدولة تلقائياً حسب IP
+        function initInternationalPhoneInputs() {
+            const guestPhoneInput = document.querySelector("#bookGuestPhone");
+            const regPhoneInput = document.querySelector("#regPhone");
+
+            const phoneConfig = {
+                initialCountry: "auto",
+                separateDialCode: true,
+                geoIpLookup: function(success, failure) {
+                    fetch("https://ipapi.co/json/")
+                        .then(res => res.json())
+                        .then(data => success(data.country_code))
+                        .catch(() => success("sa"));
+                },
+                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
+            };
+
+            if (guestPhoneInput) {
+                itiGuestPhone = window.intlTelInput(guestPhoneInput, phoneConfig);
+            }
+            if (regPhoneInput) {
+                itiRegPhone = window.intlTelInput(regPhoneInput, phoneConfig);
+            }
+        }
 
         function playNotificationSound() {
             try {
@@ -591,10 +633,15 @@
             event.preventDefault();
             const name = document.getElementById('regName').value;
             const email = document.getElementById('regEmail').value.toLowerCase();
-            const phone = document.getElementById('regPhone').value;
+            const fullPhone = itiRegPhone ? itiRegPhone.getNumber() : document.getElementById('regPhone').value;
             const password = document.getElementById('regPassword').value;
 
-            const userData = { name, email, phone, password, invoices: [] };
+            if (itiRegPhone && !itiRegPhone.isValidNumber()) {
+                showToast("يرجى إدخال رقم هاتف صحيح مع رمز الدولة.");
+                return;
+            }
+
+            const userData = { name, email, phone: fullPhone, password, invoices: [] };
             localStorage.setItem(email, JSON.stringify(userData));
             localStorage.setItem('activeSessionUser', email);
 
@@ -745,9 +792,13 @@
                 clientPhone = userData.phone;
             } else {
                 clientName = document.getElementById('bookGuestName').value.trim();
-                clientPhone = document.getElementById('bookGuestPhone').value.trim();
+                clientPhone = itiGuestPhone ? itiGuestPhone.getNumber() : document.getElementById('bookGuestPhone').value.trim();
                 if(!clientName || !clientPhone) {
                     showToast("يرجى كتابة الاسم ورقم الجوال أولاً.");
+                    return;
+                }
+                if (itiGuestPhone && !itiGuestPhone.isValidNumber()) {
+                    showToast("يرجى إدخال رقم هاتف صحيح مع رمز الدولة.");
                     return;
                 }
             }
@@ -1306,7 +1357,7 @@
                 </div>
                 <div class="service-card">
                     <div><div class="service-icon">💻</div><h3>برمجة وفحص كمبيوتر</h3><p>تحديث الأنظمة، قراءة الأعطال بدقة، وبرمجة كاملة لجميع كمبيوترات بورش.</p></div>
-<button class="service-book-btn" onclick="quickBook('برمجة وفحص كمبيوتر متطور')">حجز موعد</button>
+                    <button class="service-book-btn" onclick="quickBook('برمجة وفحص كمبيوتر متطور')">حجز موعد</button>
                 </div>
             </div>
         </div>
@@ -1345,7 +1396,7 @@
                     </div>
                     <div class="form-group" id="guestPhoneGroup">
                         <label>رقم هاتف العميل</label>
-                        <input type="tel" id="bookGuestPhone" placeholder="05xxxxxxxx">
+                        <input type="tel" id="bookGuestPhone" placeholder="أدخل رقم الجوال">
                     </div>
 
                     <div class="form-group">
@@ -1471,7 +1522,7 @@
                 <form onsubmit="handleRegister(event)">
                     <div class="form-group"><label>الاسم بالكامل</label><input type="text" id="regName" required placeholder="أدخل اسمك الكريم"></div>
                     <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="regEmail" required placeholder="name@example.com"></div>
-                    <div class="form-group"><label>رقم الجوال</label><input type="tel" id="regPhone" required placeholder="05xxxxxxxx"></div>
+                    <div class="form-group"><label>رقم الجوال</label><input type="tel" id="regPhone" required placeholder="أدخل رقم الجوال"></div>
                     <div class="form-group"><label>إنشاء كلمة المرور</label><input type="password" id="regPassword" required placeholder="أدخل كلمة المرور"></div>
                     <button type="submit" class="btn">إنشاء وحفظ الحساب</button>
                 </form>
