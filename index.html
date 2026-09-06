@@ -279,7 +279,7 @@
         #page-login, #page-register, #page-booking, #page-admin { background-color: var(--porsche-black); }
         .form-section { display: flex; justify-content: center; align-items: center; padding: 50px 20px; }
         .form-container { background: var(--porsche-surface); padding: 40px; border-radius: 8px; width: 100%; max-width: 550px; border-top: 5px solid var(--porsche-orange); border: 1px solid #222; box-shadow: 0 15px 40px rgba(0,0,0,0.6); }
-        .form-container.admin-container { max-width: 1150px; }
+        .form-container.admin-container { max-width: 1200px; }
         .form-container h3 { margin-bottom: 8px; text-align: center; color: white; font-size: 24px; font-weight: 800; }
         .work-hours-note { text-align: center; color: #aaa; font-size: 13px; margin-bottom: 25px; }
         .form-group { margin-bottom: 18px; text-align: right; }
@@ -306,6 +306,7 @@
             gap: 15px;
             margin-bottom: 20px;
             flex-wrap: wrap;
+            align-items: center;
         }
 
         .filter-container input, .filter-container select {
@@ -325,7 +326,7 @@
 
         .admin-stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 15px;
             margin-bottom: 30px;
         }
@@ -353,6 +354,8 @@
 
         .status-pending { border-right: 6px solid var(--porsche-orange); background: #1a1512; }
         .status-accepted { border-right: 6px solid #2e7d32; background: #111c14 !important; }
+        .status-working { border-right: 6px solid #0288d1; background: #0d1a24 !important; }
+        .status-completed { border-right: 6px solid #7b1fa2; background: #190e24 !important; }
         .status-rejected { border-right: 6px solid #c62828; background: #201313 !important; }
 
         .ticket-box h4 { margin-bottom: 15px; font-size: 18px; border-bottom: 1px solid #333; padding-bottom: 8px; color: white; font-weight: 700; }
@@ -362,6 +365,8 @@
         .badge-status { padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 12px; display: inline-block; }
         .badge-pending { background: rgba(255, 152, 0, 0.2); color: #ffb74d; border: 1px solid rgba(255, 152, 0, 0.4); }
         .badge-accepted { background: rgba(46, 125, 50, 0.2); color: #81c784; border: 1px solid rgba(46, 125, 50, 0.4); }
+        .badge-working { background: rgba(2, 136, 209, 0.2); color: #29b6f6; border: 1px solid rgba(2, 136, 209, 0.4); }
+        .badge-completed { background: rgba(123, 31, 162, 0.2); color: #ba68c8; border: 1px solid rgba(123, 31, 162, 0.4); }
         .badge-rejected { background: rgba(198, 40, 40, 0.2); color: #e57373; border: 1px solid rgba(198, 40, 40, 0.4); }
 
         .invoice-block {
@@ -383,6 +388,12 @@
         
         .btn-approve { background-color: #2e7d32; box-shadow: 0 4px 15px rgba(46,125,50,0.4); }
         .btn-approve:hover { background-color: #1b5e20; }
+
+        .btn-working { background-color: #0288d1; box-shadow: 0 4px 15px rgba(2,136,209,0.4); }
+        .btn-working:hover { background-color: #01579b; }
+
+        .btn-completed { background-color: #7b1fa2; box-shadow: 0 4px 15px rgba(123,31,162,0.4); }
+        .btn-completed:hover { background-color: #4a148c; }
         
         .btn-reject { background-color: #c62828; box-shadow: 0 4px 15px rgba(198,40,40,0.4); }
         .btn-reject:hover { background-color: #b71c1c; }
@@ -394,6 +405,11 @@
             background-color: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; transition: 0.3s;
         }
         .btn-pdf:hover { background-color: #218838; }
+
+        .btn-excel {
+            background-color: #17a2b8; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; transition: 0.3s;
+        }
+        .btn-excel:hover { background-color: #138496; }
 
         .form-redirect { text-align: center; margin-top: 18px; color: #888; font-size: 13px; }
         .form-redirect a { color: var(--porsche-orange); cursor: pointer; text-decoration: none; font-weight: bold; }
@@ -446,7 +462,8 @@
     </style>
 
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzI0dA5d-5moktdJhOIZEHoXMLXjQfYKmHbhZaQc5NiEPXr6S2BEicoCJqyKoTk2MWWpA/exec";
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby4K3mlPQleFcwfXpn1dTuhT77YrIdTItDEZXFgEaT2boAjVF3Ca1GycqkunWDXdzP2/exec";
+        
         const porscheImages = [
             'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=1920&q=80',
             'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1920&q=80',
@@ -456,7 +473,6 @@
         let previousBookingCount = -1;
         let adminAutoRefreshInterval = null;
 
-        // متغيرات حفظ مثيلات إدخال الهواتف الدولية
         let itiGuestPhone = null;
         let itiRegPhone = null;
 
@@ -468,7 +484,6 @@
             handleServiceFieldsChange();
         };
 
-        // تهيئة حقول الهاتف وتحديد رمز الدولة تلقائياً حسب IP
         function initInternationalPhoneInputs() {
             const guestPhoneInput = document.querySelector("#bookGuestPhone");
             const regPhoneInput = document.querySelector("#regPhone");
@@ -526,14 +541,26 @@
             element.classList.toggle('active');
         }
 
+        /* حفظ جلسة الأدمن في sessionStorage */
         window.checkAdminPassword = function() {
+            if (sessionStorage.getItem('isAdminLoggedIn') === 'true') {
+                navigateTo('admin');
+                return;
+            }
             const password = prompt("🔐 يرجى إدخال كلمة مرور لوحة الإدارة:");
             if (password === "ADAM2030") {
+                sessionStorage.setItem('isAdminLoggedIn', 'true');
                 showToast("تم التحقق بنجاح، جاري فتح لوحة الإدارة...");
                 navigateTo('admin');
             } else if (password !== null) {
                 showToast("❌ كلمة المرور غير صحيحة!");
             }
+        }
+
+        window.adminLogout = function() {
+            sessionStorage.removeItem('isAdminLoggedIn');
+            showToast("تم تسجيل الخروج من لوحة الإدارة.");
+            navigateTo('home');
         }
 
         window.handleServiceFieldsChange = function() {
@@ -703,7 +730,6 @@
             let cloudBookings = await getBookingsFromCloud();
             let sessionEmail = localStorage.getItem('activeSessionUser');
 
-            // تحديث كارت الحجز المعروض حالياً إذا وجد
             const currentInvId = document.getElementById('invId');
             if (currentInvId && currentInvId.innerText !== "0000" && cloudBookings && cloudBookings.length > 0) {
                 let targetId = currentInvId.innerText;
@@ -724,6 +750,18 @@
                         liveBadge.innerText = "مقبول";
                         mainTitle.innerText = "✅ حالة الطلب: تم قبول الموعد بنجاح";
                         invPrice.innerText = serverPrice;
+                    } else if (serverStatus === 'جاري العمل') {
+                        ticketBox.className = "ticket-box status-working";
+                        liveBadge.className = "badge-status badge-working";
+                        liveBadge.innerText = "جاري العمل";
+                        mainTitle.innerText = "🛠️ حالة الطلب: السيارة قيد الصيانة حالياً";
+                        invPrice.innerText = serverPrice;
+                    } else if (serverStatus === 'مكتمل') {
+                        ticketBox.className = "ticket-box status-completed";
+                        liveBadge.className = "badge-status badge-completed";
+                        liveBadge.innerText = "مكتمل";
+                        mainTitle.innerText = "🎉 حالة الطلب: تمت الصيانة والسيارة جاهزة للاستلام";
+                        invPrice.innerText = serverPrice;
                     } else if (serverStatus === 'مرفوض' || serverStatus === 'تم رفض الطلب') {
                         ticketBox.className = "ticket-box status-rejected";
                         liveBadge.className = "badge-status badge-rejected";
@@ -734,7 +772,6 @@
                 }
             }
 
-            // تحديث سجل الصيانة القائمة الجانبية للعميل تلقائياً ببيانات السحابة
             if (sessionEmail && cloudBookings && cloudBookings.length > 0) {
                 let currentUser = JSON.parse(localStorage.getItem(sessionEmail));
                 if (currentUser) {
@@ -908,13 +945,27 @@
 
             let totalCount = allGlobalBookings.length;
             let acceptedCount = allGlobalBookings.filter(b => b.status === 'مقبول' || b.status === 'تم قبول الطلب').length;
+            let workingCount = allGlobalBookings.filter(b => b.status === 'جاري العمل').length;
+            let completedCount = allGlobalBookings.filter(b => b.status === 'مكتمل').length;
             let pendingCount = allGlobalBookings.filter(b => !b.status || b.status === 'قيد الانتظار' || b.status === 'جديد').length;
             let rejectedCount = allGlobalBookings.filter(b => b.status === 'مرفوض' || b.status === 'تم رفض الطلب').length;
 
+            /* حساب الإيرادات الإجمالية للمبالغ المحددة */
+            let totalRevenue = 0;
+            allGlobalBookings.forEach(b => {
+                if (b.price && (b.status === 'مقبول' || b.status === 'جاري العمل' || b.status === 'مكتمل')) {
+                    let num = parseFloat(b.price.replace(/[^0-9.]/g, ''));
+                    if (!isNaN(num)) totalRevenue += num;
+                }
+            });
+
             document.getElementById('statTotal').innerText = totalCount;
             document.getElementById('statAccepted').innerText = acceptedCount;
+            document.getElementById('statWorking').innerText = workingCount;
+            document.getElementById('statCompleted').innerText = completedCount;
             document.getElementById('statPending').innerText = pendingCount;
             document.getElementById('statRejected').innerText = rejectedCount;
+            document.getElementById('statRevenue').innerText = totalRevenue.toLocaleString() + " ر.س";
 
             if (totalCount === 0) {
                 tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:25px; color:#aaa;">لا توجد طلبات حجز واردة حالياً</td></tr>';
@@ -925,6 +976,8 @@
                 let badgeClass = 'badge-pending';
                 let statusText = booking.status || 'قيد الانتظار';
                 if (statusText === 'مقبول' || statusText === 'تم قبول الطلب') badgeClass = 'badge-accepted';
+                if (statusText === 'جاري العمل') badgeClass = 'badge-working';
+                if (statusText === 'مكتمل') badgeClass = 'badge-completed';
                 if (statusText === 'مرفوض' || statusText === 'تم رفض الطلب') badgeClass = 'badge-rejected';
 
                 let bId = booking.bookingNumber || booking.id || '---';
@@ -965,10 +1018,12 @@
                             <input type="text" id="reasonInput_${index}" placeholder="سبب الرفض" style="padding:6px; width:140px; background:#111; color:white; border:1px solid #444; font-size:12px; border-radius:4px;" value="${bReason}">
                         </div>
                         <div style="display: flex; gap: 4px; justify-content: center; flex-wrap: wrap;">
-                            <button class="btn btn-approve" style="padding: 6px 12px; font-size:12px; width:auto;" onclick="adminUpdateBookingStatus('${bId}', ${index}, 'مقبول')">✅ قبول</button>
-                            <button class="btn btn-reject" style="padding: 6px 12px; font-size:12px; width:auto;" onclick="adminUpdateBookingStatus('${bId}', ${index}, 'مرفوض')">❌ رفض</button>
-                            <button class="btn btn-delete" style="padding: 6px 12px; font-size:12px; width:auto;" onclick="adminDeleteBooking('${bId}')">🗑️ حذف</button>
-                            <button class="btn-pdf" style="padding: 6px 12px; font-size:12px; width:auto;" onclick="downloadPDF(${bookingDataJson})">📄 PDF</button>
+                            <button class="btn btn-approve" style="padding: 6px 10px; font-size:11px; width:auto;" onclick="adminUpdateBookingStatus('${bId}', ${index}, 'مقبول')">✅ قبول</button>
+                            <button class="btn btn-working" style="padding: 6px 10px; font-size:11px; width:auto;" onclick="adminUpdateBookingStatus('${bId}', ${index}, 'جاري العمل')">🛠️ بدء العمل</button>
+                            <button class="btn btn-completed" style="padding: 6px 10px; font-size:11px; width:auto;" onclick="adminUpdateBookingStatus('${bId}', ${index}, 'مكتمل')">🎉 مكتمل</button>
+                            <button class="btn btn-reject" style="padding: 6px 10px; font-size:11px; width:auto;" onclick="adminUpdateBookingStatus('${bId}', ${index}, 'مرفوض')">❌ رفض</button>
+                            <button class="btn btn-delete" style="padding: 6px 10px; font-size:11px; width:auto;" onclick="adminDeleteBooking('${bId}')">🗑️ حذف</button>
+                            <button class="btn-pdf" style="padding: 6px 10px; font-size:11px; width:auto;" onclick="downloadPDF(${bookingDataJson})">📄 PDF</button>
                         </div>
                     </td>
                 `;
@@ -996,6 +1051,39 @@
                     row.style.display = 'none';
                 }
             });
+        }
+
+        /* دالة تصدير الجدول إلى ملف CSV (إكسل) */
+        window.exportToCSV = function() {
+            let rows = [["رقم الحجز", "معلومات العميل والسيارة", "الخدمة والتاريخ", "الحالة"]];
+            let tableRows = document.querySelectorAll('#bookingsTableBody tr');
+            
+            if (tableRows.length === 0 || tableRows[0].cells.length < 4) {
+                showToast("لا توجد بيانات للتصدير.");
+                return;
+            }
+
+            tableRows.forEach(row => {
+                if(row.style.display !== 'none' && row.cells.length >= 4) {
+                    let cols = [
+                        `"${row.cells[0].innerText.replace(/\n/g, ' ')}"`,
+                        `"${row.cells[1].innerText.replace(/\n/g, ' ')}"`,
+                        `"${row.cells[2].innerText.replace(/\n/g, ' ')}"`,
+                        `"${row.cells[3].innerText.replace(/\n/g, ' ')}"`
+                    ];
+                    rows.push(cols);
+                }
+            });
+
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF" + rows.map(e => e.join(",")).join("\n");
+            let encodedUri = encodeURI(csvContent);
+            let link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Adam_Auto_Bookings_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast("تم تحميل ملف البيانات بنجاح.");
         }
 
         window.downloadPDF = function(booking) {
@@ -1100,10 +1188,10 @@
             let priceInputVal = document.getElementById(`priceInput_${index}`).value.trim();
             let reasonInputVal = document.getElementById(`reasonInput_${index}`).value.trim();
 
-            let finalPrice = newStatus === 'مقبول' ? (priceInputVal || "معتمد") : "يحدد من الإدارة";
+            let finalPrice = (newStatus === 'مقبول' || newStatus === 'جاري العمل' || newStatus === 'مكتمل') ? (priceInputVal || "معتمد") : "يحدد من الإدارة";
             let finalReason = newStatus === 'مرفوض' ? (reasonInputVal || "تم إلغاء الموعد") : "";
 
-            showToast(`جاري تحديث الحالة في السحابة وفي حساب العميل...`);
+            showToast(`جاري تحديث الحالة في السحابة...`);
 
             try {
                 await fetch(WEB_APP_URL, {
@@ -1119,7 +1207,6 @@
                     })
                 });
 
-                // تحديث قاعدة البيانات المحلية لكافة المستخدمين في LocalStorage
                 for (let i = 0; i < localStorage.length; i++) {
                     let key = localStorage.key(i);
                     if (key && key.includes('@')) {
@@ -1141,7 +1228,6 @@
                     }
                 }
 
-                // تحديث القائمة الجانبية (سجل الصيانة وحجوزاتك) فوراً دون الحاجة لتحديث الصفحة
                 let sessionEmail = localStorage.getItem('activeSessionUser');
                 if (sessionEmail) {
                     let currentUser = JSON.parse(localStorage.getItem(sessionEmail));
@@ -1174,6 +1260,8 @@
                 let statusColor = "#ffb74d";
                 let statusText = inv.status || 'قيد الانتظار';
                 if(statusText === "مقبول" || statusText === "تم قبول الطلب") statusColor = "#81c784";
+                if(statusText === "جاري العمل") statusColor = "#29b6f6";
+                if(statusText === "مكتمل") statusColor = "#ba68c8";
                 if(statusText === "مرفوض" || statusText === "تم رفض الطلب") statusColor = "#e57373";
 
                 let reasonSub = inv.reason ? `<div style="color:#ff6b6b;">السبب: ${inv.reason}</div>` : '';
@@ -1534,14 +1622,20 @@
     <div id="page-admin" class="page">
         <section class="form-section">
             <div class="form-container admin-container" style="border-top-color: #2e7d32;">
-                <h3>🔐 لوحة التحكم السحابية للمسؤولين</h3>
-                <p class="work-hours-note">إدارة واعتماد الحجوزات الواردة من السحابة في مكان واحد (يتم التحديث والتنبيه تلقائياً كل 10 ثوانٍ)</p>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <h3>🔐 لوحة التحكم السحابية للمسؤولين</h3>
+                    <button onclick="adminLogout()" class="btn-delete" style="padding:6px 12px; font-size:12px; border-radius:4px;">🔒 خروج الأدمن</button>
+                </div>
+                <p class="work-hours-note">إدارة واعتماد الحجوزات الواردة من السحابة ومتابعة سير الصيانة</p>
                 
                 <div class="admin-stats-grid">
                     <div class="admin-stat-card"><h4 id="statTotal">0</h4><p>إجمالي الطلبات</p></div>
                     <div class="admin-stat-card" style="border-top-color: #2e7d32;"><h4 id="statAccepted" style="color: #81c784;">0</h4><p>الحجوزات المقبولة</p></div>
+                    <div class="admin-stat-card" style="border-top-color: #0288d1;"><h4 id="statWorking" style="color: #29b6f6;">0</h4><p>قيد العمل</p></div>
+                    <div class="admin-stat-card" style="border-top-color: #7b1fa2;"><h4 id="statCompleted" style="color: #ba68c8;">0</h4><p>مكتملة</p></div>
                     <div class="admin-stat-card" style="border-top-color: #ff9800;"><h4 id="statPending" style="color: #ffb74d;">0</h4><p>قيد الانتظار</p></div> 
-                    <div class="admin-stat-card" style="border-top-color: #f44336;"><h4 id="statRejected" style="color: #e57373;">0</h4><p>الطلبات المرفوضة</p></div>
+                    <div class="admin-stat-card" style="border-top-color: #f44336;"><h4 id="statRejected" style="color: #e57373;">0</h4><p>مرفوضة</p></div>
+                    <div class="admin-stat-card" style="border-top-color: #28a745;"><h4 id="statRevenue" style="color: #28a745; font-size: 22px;">0 ر.س</h4><p>الإيرادات المتوقعة</p></div>
                 </div>
 
                 <!-- شريط البحث والفلترة لوحة الإدارة -->
@@ -1551,8 +1645,11 @@
                         <option value="ALL">جميع الحالات</option>
                         <option value="قيد الانتظار">قيد الانتظار</option>
                         <option value="مقبول">مقبول</option>
+                        <option value="جاري العمل">جاري العمل</option>
+                        <option value="مكتمل">مكتمل</option>
                         <option value="مرفوض">مرفوض</option>
                     </select>
+                    <button class="btn-excel" onclick="exportToCSV()">📊 تصدير إلى Excel</button>
                 </div>
 
                 <div class="table-responsive" style="overflow-x: auto; margin-bottom: 25px;">
